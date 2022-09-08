@@ -1,6 +1,6 @@
 # Storefront Backend
 
-Simple online store using Typescript & PostgresSql.
+Upcoming online store using Typescript & PostgreSql.
 
 
 ## Tools & Dependencies

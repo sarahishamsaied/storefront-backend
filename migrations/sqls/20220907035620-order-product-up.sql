@@ -1,0 +1,2 @@
+CREATE TABLE order_product(id SERIAL PRIMARY KEY, product_id bigInt ,order_id bigInt ,quantity integer,
+CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id), CONSTRAINT fk_order FOREIGN KEY(order_id) REFERENCES orders(id));

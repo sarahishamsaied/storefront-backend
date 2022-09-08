@@ -1,0 +1,21 @@
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { Request, Response } from 'express';
+import userRoutes from './handlers/Users/user_handlers';
+import productRoutes from './handlers/Products/product_handlers';
+import { orderRoutes } from './handlers/Orders/order_handlers';
+dotenv.config();
+const app: express.Application = express();
+app.use(express.json());
+app.use(cors());
+userRoutes(app);
+productRoutes(app);
+orderRoutes(app);
+const port = process.env.PORT;
+export const myFunc = (n: number): number => {
+  return n * n;
+};
+app.get('/', (req: Request, res: Response) => res.send('Hello World!'));
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+export default app;

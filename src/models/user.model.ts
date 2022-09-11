@@ -14,14 +14,7 @@ const checkUserExists = async (email: string): Promise<boolean> => {
   connection.release();
   return result.rows.length > 0 ? true : false;
 };
-const getUser = async (id: string): Promise<User> => {
-  const connection = await Client.connect();
-  const sql = `SELECT * FROM users WHERE id = ${id} LIMIT 1`;
-  const result = await connection.query(sql);
-  connection.release();
-  console.log(result);
-  return result.rows[0];
-};
+
 const getUserByEmail = async (email: string): Promise<User> => {
   try {
     const connection = await Client.connect();
@@ -35,11 +28,16 @@ const getUserByEmail = async (email: string): Promise<User> => {
   }
 };
 const addUser = async (user: User): Promise<User> => {
-  const connection = await Client.connect();
-  const sql = `INSERT INTO users (firstname,lastname,user_email,user_password) VALUES ('${user.firstname}','${user.lastname}','${user.user_email}' ,'${user.user_password}') `;
-  const result = await connection.query(sql);
-  connection.release();
-  return user;
+  try {
+    const connection = await Client.connect();
+    const sql = `INSERT INTO users (firstname,lastname,user_email,user_password) VALUES ('${user.firstname}','${user.lastname}','${user.user_email}' ,'${user.user_password}') `;
+    const result = await connection.query(sql);
+    connection.release();
+    return user;
+  } catch (error) {
+    console.log(error);
+    throw new Error('Cannot add user');
+  }
 };
 const authenticate = async (
   email: string,
@@ -79,6 +77,23 @@ export default class UserStore {
     } catch (error) {
       console.log(error);
       throw new Error('Cannot get users');
+    }
+  }
+  async getUser(id: string): Promise<User> {
+    let errorMessage = 'Cannot get user';
+    try {
+      const connection = await Client.connect();
+      const sql = `SELECT * FROM users WHERE id = ${id} LIMIT 1`;
+      const result = await connection.query(sql);
+      connection.release();
+      console.log(result.rowCount);
+      if (result.rowCount === 0) {
+        errorMessage = `User with id = ${id} is not found`;
+        throw new Error(errorMessage);
+      } else return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      throw new Error(errorMessage);
     }
   }
   async login(email: string, password: string): Promise<User> {
@@ -146,7 +161,7 @@ export default class UserStore {
     let errorMessage = 'An error occured';
     try {
       const connection = await Client.connect();
-      const user = await getUser(id);
+      const user = await this.getUser(id);
       if (!user) {
         errorMessage = 'User does not exist';
         throw new Error(errorMessage);

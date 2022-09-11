@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import express from 'express';
 import ProductStore from '../../models/product.model';
+import jwt from 'jsonwebtoken';
 const store = new ProductStore();
 const index = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -37,9 +38,10 @@ const show = async (req: Request, res: Response): Promise<void> => {
 const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.body;
-    const response = await store.create(user);
+    const product = await store.create(user);
+    const token = jwt.sign({ product }, process.env.TOKEN_SECRET as string);
     res.json({
-      data: response,
+      token,
       status: 'success',
     });
   } catch (error) {

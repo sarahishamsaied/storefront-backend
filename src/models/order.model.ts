@@ -21,14 +21,45 @@ export class OrderStore {
     }
   }
   async show(id: string): Promise<Order> {
+    let errorMessage = 'Cannot get order';
     try {
       const connection = await Client.connect();
       const sql = `SELECT * FROM orders where id = ${id}`;
       const response = await connection.query(sql);
-      return response.rows[0];
+      if (response.rows.length === 0) {
+        errorMessage = `Cannot find order with id = ${id}`;
+        throw new Error(errorMessage);
+      } else return response.rows[0];
     } catch (error) {
       console.log(error);
-      throw new Error('Cannot get order');
+      throw new Error(errorMessage);
+    }
+  }
+  async completeOrder(id: string): Promise<void> {
+    let errorMessage = 'Cannot complete order';
+    try {
+      const connection = await Client.connect();
+      const sql = `UPDATE orders SET status = 'COMPLETE' where id = ${id}`;
+      const response = await connection.query(sql);
+      console.log(response);
+      if (response.rowCount === 0) {
+        errorMessage = `Cannot find order with id = ${id}`;
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(errorMessage);
+    }
+  }
+  async showUserOrders(uid: string): Promise<Order[]> {
+    try {
+      const connection = await Client.connect();
+      const sql = `SELECT * FROM orders where user_id = ${uid}`;
+      const orders = await connection.query(sql);
+      return orders.rows;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Cannot show orders');
     }
   }
   async addProduct(

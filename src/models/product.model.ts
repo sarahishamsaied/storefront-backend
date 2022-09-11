@@ -29,12 +29,12 @@ export default class ProductStore {
       throw new Error('Cannot get product');
     }
   }
-  async create(product: Product): Promise<void> {
+  async create(product: Product): Promise<Product> {
     try {
       const connection = await Client.connect();
       const sql = `INSERT INTO products (productname,price,category) VALUES ('${product.name}','${product.price}','${product.category}')`;
-      const result = await connection.query(sql);
-      console.log(result.rows);
+      const addedProduct = await connection.query(sql);
+      return addedProduct.rows[0];
     } catch (error) {
       console.log(error);
       throw new Error('Cannot insert into products');

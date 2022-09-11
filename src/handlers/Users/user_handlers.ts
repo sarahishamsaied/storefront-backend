@@ -95,11 +95,26 @@ const login = async (req: Request, res: Response) => {
       });
   }
 };
+const show = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id = req.params.id;
+    const user = await store.getUser(id);
+    const token = jwt.sign({ user: user }, process.env.TOKEN_SECRET as string);
+    res.json({
+      status: 200,
+      token,
+    });
+  } catch (error) {
+    if (error instanceof Error)
+      res.status(400).json({ message: error.message });
+  }
+};
 const userRoutes = (app: express.Application) => {
   app.get('/api/users', index);
-  app.post('/api/user', create);
+  app.get('/api/user/:id', show);
+  app.post('/api/auth/signup', create);
   app.delete('/api/user/:id', remove);
   app.patch('/api/user/:id', update);
-  app.post('/api/users/login', login);
+  app.post('/api/auth/signin', login);
 };
 export default userRoutes;

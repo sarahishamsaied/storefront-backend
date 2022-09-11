@@ -7,6 +7,10 @@ export type User = {
   user_email: string;
   user_password: string;
 };
+const checkEmpty = (str: string): boolean => {
+  console.log(str.length);
+  return str.length > 0 ? false : true;
+};
 const checkUserExists = async (email: string): Promise<boolean> => {
   const connection = await Client.connect();
   const sql = `SELECT * FROM users WHERE user_email = '${email}'`;
@@ -117,7 +121,7 @@ export default class UserStore {
           throw new Error(errorMessage);
         }
       } else {
-        errorMessage = "User doesn't exist";
+        errorMessage = 'User not found';
         throw new Error(errorMessage);
       }
     } catch (error) {
@@ -126,13 +130,28 @@ export default class UserStore {
     }
   }
   async create(user: User): Promise<User> {
-    user.user_password = bcrypt.hashSync(
-      user.user_password,
-      parseInt(process.env.SALT_ROUNDS as string)
-    );
-    console.log(user);
     let errorMessage = 'Cannot insert into users';
     try {
+      const isEmailEmpty: boolean = checkEmpty(user.user_email);
+      const isPasswordEmpty: boolean = checkEmpty(user.user_password);
+      const isFirstNameEmpty: boolean = checkEmpty(user.firstname);
+      const isLastNameEmpty: boolean = checkEmpty(user.lastname);
+      console.log(isEmailEmpty);
+      if (
+        isEmailEmpty ||
+        isPasswordEmpty ||
+        isFirstNameEmpty ||
+        isLastNameEmpty
+      ) {
+        console.log('invalid');
+        errorMessage = 'All fields must be filled';
+        throw new Error(errorMessage);
+      }
+      user.user_password = bcrypt.hashSync(
+        user.user_password,
+        parseInt(process.env.SALT_ROUNDS as string)
+      );
+      console.log(user);
       const userExists = await checkUserExists(user.user_email);
       if (!userExists) return addUser(user);
       else {

@@ -41,7 +41,9 @@ const create = async (req: Request, res: Response): Promise<void> => {
     let message;
     if (error instanceof Error) message = error.message;
     else message = String(error);
-    res.status(400).send(message);
+    res.status(400).json({
+      message,
+    });
   }
 };
 const remove = async (req: Request, res: Response): Promise<void> => {

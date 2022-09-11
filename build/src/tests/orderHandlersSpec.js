@@ -15,10 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const index_1 = __importDefault(require("../index"));
 const request = (0, supertest_1.default)(index_1.default);
-describe('Testing Users', () => {
-    it('Should return an error when an invalid id is entered', () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield request.get('/api/user/1000');
-        expect(response.body.message).toBe('');
-        expect(response.body.message).toBe('User with id = 1000 is not found');
+describe('Testing orders', () => {
+    it('Should return an error when order id is not found', () => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield request.get('/api/order/1000');
+        expect(response.body.message).toBe('Cannot find order with id = 1000');
+    }));
+    it('Should return an error when user id is not found', () => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield request.get('/api/orders/user/1000');
+        expect(response.body.message).toBe('Cannot find order with user id = 1000');
     }));
 });

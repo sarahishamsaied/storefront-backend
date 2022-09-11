@@ -16,7 +16,6 @@ export class OrderStore {
       const response = await connection.query(sql);
       return response.rows;
     } catch (error) {
-      console.log(error);
       throw new Error('Cannot get orders');
     }
   }
@@ -31,7 +30,6 @@ export class OrderStore {
         throw new Error(errorMessage);
       } else return response.rows[0];
     } catch (error) {
-      console.log(error);
       throw new Error(errorMessage);
     }
   }
@@ -47,19 +45,22 @@ export class OrderStore {
         throw new Error(errorMessage);
       }
     } catch (error) {
-      console.log(error);
       throw new Error(errorMessage);
     }
   }
   async showUserOrders(uid: string): Promise<Order[]> {
+    let errorMessage = 'Cannot show orders';
     try {
       const connection = await Client.connect();
       const sql = `SELECT * FROM orders where user_id = ${uid}`;
       const orders = await connection.query(sql);
+      if (orders.rowCount === 0) {
+        errorMessage = `Cannot find order with user id = ${uid}`;
+        throw new Error(errorMessage);
+      }
       return orders.rows;
     } catch (error) {
-      console.log(error);
-      throw new Error('Cannot show orders');
+      throw new Error(errorMessage);
     }
   }
   async addProduct(
@@ -74,7 +75,7 @@ export class OrderStore {
       const order = response.rows[0];
       console.log(order);
     } catch (error) {
-      console.log(error);
+      throw new Error('cannot add product');
     }
   }
   async create(user_id: string, status: Status): Promise<void> {
@@ -86,7 +87,6 @@ export class OrderStore {
       const order = response.rows[0];
       console.log(order);
     } catch (error) {
-      console.log(error);
       throw new Error('Cannot add order');
     }
   }

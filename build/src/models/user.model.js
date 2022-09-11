@@ -14,6 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../Database/database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const checkEmpty = (str) => {
+    console.log(str.length);
+    return str.length > 0 ? false : true;
+};
 const checkUserExists = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const connection = yield database_1.default.connect();
     const sql = `SELECT * FROM users WHERE user_email = '${email}'`;
@@ -132,7 +136,7 @@ class UserStore {
                     }
                 }
                 else {
-                    errorMessage = "User doesn't exist";
+                    errorMessage = 'User not found';
                     throw new Error(errorMessage);
                 }
             }
@@ -144,10 +148,23 @@ class UserStore {
     }
     create(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            user.user_password = bcrypt_1.default.hashSync(user.user_password, parseInt(process.env.SALT_ROUNDS));
-            console.log(user);
             let errorMessage = 'Cannot insert into users';
             try {
+                const isEmailEmpty = checkEmpty(user.user_email);
+                const isPasswordEmpty = checkEmpty(user.user_password);
+                const isFirstNameEmpty = checkEmpty(user.firstname);
+                const isLastNameEmpty = checkEmpty(user.lastname);
+                console.log(isEmailEmpty);
+                if (isEmailEmpty ||
+                    isPasswordEmpty ||
+                    isFirstNameEmpty ||
+                    isLastNameEmpty) {
+                    console.log('invalid');
+                    errorMessage = 'All fields must be filled';
+                    throw new Error(errorMessage);
+                }
+                user.user_password = bcrypt_1.default.hashSync(user.user_password, parseInt(process.env.SALT_ROUNDS));
+                console.log(user);
                 const userExists = yield checkUserExists(user.user_email);
                 if (!userExists)
                     return addUser(user);

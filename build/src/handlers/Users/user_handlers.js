@@ -51,7 +51,9 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message = error.message;
         else
             message = String(error);
-        res.status(400).send(message);
+        res.status(400).json({
+            message,
+        });
     }
 });
 const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

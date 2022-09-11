@@ -6,9 +6,10 @@ const store = new ProductStore();
 const index = async (req: Request, res: Response): Promise<void> => {
   try {
     const response = await store.index();
+    console.log('res is', response);
     res.json({
       data: response,
-      status: 'success',
+      message: 'success',
     });
   } catch (err) {
     console.log(err);
@@ -45,11 +46,11 @@ const create = async (req: Request, res: Response): Promise<void> => {
       status: 'success',
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: 'Internal Server Error',
-      status: 500,
-    });
+    if (error instanceof Error)
+      res.status(400).json({
+        message: error.message,
+        status: 500,
+      });
   }
 };
 const showByCategory = async (req: Request, res: Response): Promise<void> => {
@@ -74,10 +75,26 @@ const showByCategory = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
+const remove = async (req: Request, res: Response): Promise<void> => {
+  const id: string = req.params.id;
+  try {
+    const response = await store.delete(id);
+    console.log(response);
+    res.json({
+      message: 'success',
+    });
+  } catch (error) {
+    if (error instanceof Error)
+      res.status(400).json({
+        message: error.message,
+      });
+  }
+};
 const productRoutes = (app: express.Application) => {
-  app.get('/api/product', index);
+  app.get('/api/products', index);
   app.post('/api/product', create);
   app.get('/api/product/:id', show);
+  app.delete('/api/product/:id', remove);
   app.get('/api/product/category/:cat', showByCategory);
 };
 export default productRoutes;

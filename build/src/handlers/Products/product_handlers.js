@@ -18,9 +18,10 @@ const store = new product_model_1.default();
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield store.index();
+        console.log('res is', response);
         res.json({
             data: response,
-            status: 'success',
+            message: 'success',
         });
     }
     catch (err) {
@@ -60,11 +61,11 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
-        res.status(500).json({
-            message: 'Internal Server Error',
-            status: 500,
-        });
+        if (error instanceof Error)
+            res.status(400).json({
+                message: error.message,
+                status: 500,
+            });
     }
 });
 const showByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -90,10 +91,27 @@ const showByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     }
 });
+const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    try {
+        const response = yield store.delete(id);
+        console.log(response);
+        res.json({
+            message: 'success',
+        });
+    }
+    catch (error) {
+        if (error instanceof Error)
+            res.status(400).json({
+                message: error.message,
+            });
+    }
+});
 const productRoutes = (app) => {
-    app.get('/api/product', index);
+    app.get('/api/products', index);
     app.post('/api/product', create);
     app.get('/api/product/:id', show);
+    app.delete('/api/product/:id', remove);
     app.get('/api/product/category/:cat', showByCategory);
 };
 exports.default = productRoutes;

@@ -75,15 +75,20 @@ class OrderStore {
     }
     showUserOrders(uid) {
         return __awaiter(this, void 0, void 0, function* () {
+            let errorMessage = 'Cannot show orders';
             try {
                 const connection = yield database_1.default.connect();
                 const sql = `SELECT * FROM orders where user_id = ${uid}`;
                 const orders = yield connection.query(sql);
+                if (orders.rowCount === 0) {
+                    errorMessage = `Cannot find order with user id = ${uid}`;
+                    throw new Error(errorMessage);
+                }
                 return orders.rows;
             }
             catch (error) {
                 console.log(error);
-                throw new Error('Cannot show orders');
+                throw new Error(errorMessage);
             }
         });
     }

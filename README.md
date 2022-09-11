@@ -1,6 +1,6 @@
 # Storefront Backend
 
-Upcoming online store using Typescript & PostgreSql.
+Upcoming simple online store using Typescript & PostgreSql.
 
 
 ## Tools & Dependencies
@@ -16,6 +16,25 @@ Upcoming online store using Typescript & PostgreSql.
 - jasmine
 
 # API Documentation
+
+
+## Installation
+
+1 - Install all dependencies
+
+    npm i 
+2 - Run all tests
+
+    npm run test
+    
+3 - Run prettier
+
+    npm run prettier
+    
+4 - Run eslint
+
+    npm run lint
+    
 
 ## Users
 1 - ***Authentication Endpoints***
@@ -37,13 +56,26 @@ Upcoming online store using Typescript & PostgreSql.
 
 [Show Info](#get-products-response-json-format) : GET `/api/products`
 
-[Show Info](#get-products-response-json-format) : GET `/api/products/id`
-
-[Show Info](#update-product-json-format) : PATCH `/api/product/:id`
+[Show Info](#get-product-response-json-format) : GET `/api/product/id`
 
 [Show Info](#delete-product-response-json-format) : DELETE `/api/product/:id`
 
-[Show Info](#add-product-json-format) : POST `/api/product/`
+[Show Info](#add-product-json-format) : POST `/api/product`
+
+
+## Orders
+
+[Show Info](#get-orders-response-json-format) : GET `/api/orders`
+
+[Show Info](#get-order-response-json-format) : GET `/api/order/id`
+
+[Show Info](#add-order-json-format) : POST `/api/order`
+
+[Show Info](#add-product-to-order-json-format) : POST `/api/orders/:id/products`
+
+[Show Info](#show-user-orders-response-json-format) : GET `/api/orders/user/:uid`
+
+[Show Info](#complete-order-response-json-format) : POST `/api/orders/complete/:id`
 
 
 ### Sign In JSON Format
@@ -103,9 +135,69 @@ Upcoming online store using Typescript & PostgreSql.
         "message": "success",
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0cyI6W3siaWQiOjEsInByb2R1Y3RuYW1lIjoidGVzdDEiLCJwcmljZSI6IjEyIiwiY2F0ZWdvcnkiOiJ0ZXN0In0seyJpZCI6MiwicHJvZHVjdG5hbWUiOiJ0ZXN0MiIsInByaWNlIjoiMTIiLCJjYXRlZ29yeSI6InRlc3QifSx7ImlkIjozLCJwcm9kdWN0bmFtZSI6InRlc3QzIiwicHJpY2UiOiIxMiIsImNhdGVnb3J5IjoidGVzdCJ9XSwiaWF0IjoxNjYyOTI4ODc3fQ.lf9xqfsa3zbwLYokj4rzkr3c8iqgWI8QNnKtRs0Y-v4"
     }
+### Get Product Response JSON Format
 
+
+    {
+        "message": "success",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0Ijp7ImlkIjoxLCJwcm9kdWN0bmFtZSI6InRlc3QxIiwicHJpY2UiOiIxMiIsImNhdGVnb3J5IjoidGVzdCJ9LCJpYXQiOjE2NjI5MjkyNTF9.-t3b4WoOSnmhUSRxXIQBgUbbv1B_UgB_xZzCdpITTCU"
+    }
+
+### Add Product JSON Format
+
+    {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NjI5MjkzNDN9.USFS3pVdP990K51c3AUT-1YHv8vMmD6XW01DR4TnvLQ",
+        "status": "success"
+    }
+    
+### Delete Product Response JSON Format
+
+    {
+        "message": "success"
+    }
+    
+    
+## Orders
+### Get Orders Response JSON Format
+
+    {
+        "message": "success",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmRlcnMiOlt7ImlkIjoxLCJ1c2VyX2lkIjoxLCJzdGF0dXMiOiJDT01QTEVURSJ9LHsiaWQiOjIsInVzZXJfaWQiOjIsInN0YXR1cyI6IkNPTVBMRVRFIn1dLCJpYXQiOjE2NjI5Mjk5MjF9.pegYa0PZSOn43Zk1cywEgzXeGBbQOUtTGDLB62vAmFE"
+    }
+    
+### Get Order Response JSON Format
+
+    {
+        "message": "success",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmRlciI6eyJpZCI6MSwidXNlcl9pZCI6MSwic3RhdHVzIjoiQ09NUExFVEUifSwiaWF0IjoxNjYyOTI5OTY1fQ.h968vs3cNvRaVAN-uBFmpTo1sK_xYStOY6SrxyZlzqk"
+    }
+   
+### Add Order JSON Format
+
+    {
+        "user_id": 1
+    }
+    
+### Show User Orders Response JSON Format
+
+    {
+        "message": "success",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmRlcnMiOlt7ImlkIjoxLCJ1c2VyX2lkIjoxLCJzdGF0dXMiOiJDT01QTEVURSJ9LHsiaWQiOjMsInVzZXJfaWQiOjEsInN0YXR1cyI6IkFDVElWRSJ9LHsiaWQiOjQsInVzZXJfaWQiOjEsInN0YXR1cyI6IkFDVElWRSJ9XSwiaWF0IjoxNjYyOTMxMzIzfQ.injdy2eRmXYrT3FTmbeZyE3rMq30qxemT99vQMYjLcQ"
+    }
+### Add Product to Order JSON Format
+
+    {
+        "product_id": 1,
+        "quantity": 1
+    }
+    
+### Complete Order Response JSON Format
+
+    {
+        "message":"success"
+    }
+    
 # .env File
-
 
     PORT = 3000
     POSTGRES_HOST = "127.0.0.1"

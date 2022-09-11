@@ -1,6 +1,5 @@
 import Client from '../../Database/database';
 export type Order = {
-  id: number;
   user_id: number;
   status: Status;
 };
@@ -75,6 +74,7 @@ export class OrderStore {
       const order = response.rows[0];
       console.log(order);
     } catch (error) {
+      console.log(error);
       throw new Error('cannot add product');
     }
   }
@@ -87,6 +87,7 @@ export class OrderStore {
       const order = response.rows[0];
       console.log(order);
     } catch (error) {
+      console.log(error);
       throw new Error('Cannot add order');
     }
   }

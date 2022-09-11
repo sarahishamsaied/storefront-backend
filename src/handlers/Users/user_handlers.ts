@@ -63,7 +63,7 @@ const remove = async (req: Request, res: Response): Promise<void> => {
 };
 const update = async (req: Request, res: Response) => {
   try {
-    const { id } = req.body;
+    const id: string = req.params.id;
     console.log(id);
     const result = await store.update(id);
     res.status(200).json({

@@ -5,34 +5,30 @@ import jwt from 'jsonwebtoken';
 const store = new ProductStore();
 const index = async (req: Request, res: Response): Promise<void> => {
   try {
-    const response = await store.index();
-    console.log('res is', response);
+    const products = await store.index();
+    const token = jwt.sign({ products }, process.env.TOKEN_SECRET as string);
     res.json({
-      data: response,
       message: 'success',
+      token,
     });
   } catch (err) {
-    console.log(err);
     res.status(400).json(err);
   }
 };
 const show = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const response = await store.show(id);
-    console.log('res is ', response);
-    response
+    const product = await store.show(id);
+    const token = jwt.sign({ product }, process.env.TOKEN_SECRET as string);
+    product
       ? res.json({
-          data: response,
           message: 'success',
-          status: 200,
+          token,
         })
       : res.status(400).json({
           message: 'Cannot find product',
-          status: 400,
         });
   } catch (error) {
-    console.log(error);
     res.status(400).json(error);
   }
 };

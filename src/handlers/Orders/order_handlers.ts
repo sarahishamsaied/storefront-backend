@@ -12,17 +12,26 @@ export const orderRoutes = (app: express.Application): void => {
   app.get('/api/orders/complete/:id', completeOrder);
 };
 const index = async (req: Request, res: Response): Promise<void> => {
-  const response = await store.index();
-  res.json({
-    response,
-  });
+  try {
+    const orders = await store.index();
+    const token = jwt.sign({ orders }, process.env.TOKEN_SECRET as string);
+    res.json({
+      message: 'success',
+      token,
+    });
+  } catch (error) {
+    if (error instanceof Error)
+      res.status(400).json({
+        message: error.message,
+      });
+  }
 };
 const create = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: string = req.body.userId;
+    const userId: string = req.body.user_id;
     const response = await store.create(userId, Status.ACTIVE);
     res.json({
-      response,
+      message: 'success',
     });
   } catch (error) {
     console.log(error);
@@ -72,7 +81,7 @@ const showUserOrders = async (req: Request, res: Response): Promise<void> => {
     const userId: string = req.params.uid;
     const orders = await store.showUserOrders(userId);
     const token = jwt.sign({ orders }, process.env.TOKEN_SECRET as string);
-    res.json({ token });
+    res.json({ message: 'success', token });
   } catch (error) {
     console.log(error);
     if (error instanceof Error)
@@ -85,12 +94,15 @@ const showUserOrders = async (req: Request, res: Response): Promise<void> => {
 const addProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const orderId: string = req.params.id;
-    const productId: string = req.body.productId;
+    const productId: string = req.body.product_id;
     const quantity: number = parseInt(req.body.quantity);
     console.log(orderId, productId, quantity);
     const addedProduct = await store.addProduct(orderId, quantity, productId);
-    res.json(addedProduct);
+    res.json({
+      message: 'success',
+    });
   } catch (error) {
+    console.log(error);
     if (error instanceof Error)
       res.status(500).json({
         status: 500,

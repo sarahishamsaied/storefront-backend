@@ -11,9 +11,9 @@ const checkEmpty = (str: string): boolean => {
   console.log(str.length);
   return str.length > 0 ? false : true;
 };
-const checkUserExists = async (email: string): Promise<boolean> => {
+const checkUserExists = async (id: string): Promise<boolean> => {
   const connection = await Client.connect();
-  const sql = `SELECT * FROM users WHERE user_email = '${email}'`;
+  const sql = `SELECT * FROM users WHERE id = '${id}'`;
   const result = await connection.query(sql);
   connection.release();
   return result.rows.length > 0 ? true : false;
@@ -87,7 +87,7 @@ export default class UserStore {
     let errorMessage = 'Cannot get user';
     try {
       const connection = await Client.connect();
-      const sql = `SELECT * FROM users WHERE id = ${id} LIMIT 1`;
+      const sql = `SELECT * FROM users WHERE id = ${id} `;
       const result = await connection.query(sql);
       connection.release();
       console.log(result.rowCount);
@@ -185,7 +185,7 @@ export default class UserStore {
         errorMessage = 'User does not exist';
         throw new Error(errorMessage);
       }
-      const sql = `UPDATE users SET firstname = '${user.firstname}', lastname = '${user.lastname}' email = '${user.user_email}', password = '${user.user_password}' WHERE id = ${id}; `;
+      const sql = `UPDATE users SET firstname = '${user.firstname}', lastname = '${user.lastname}', user_email = '${user.user_email}', user_password = '${user.user_password}' WHERE id = ${id}; `;
       const result = await connection.query(sql);
       console.log(result.rowCount);
     } catch (e) {

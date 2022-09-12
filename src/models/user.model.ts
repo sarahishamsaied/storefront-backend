@@ -87,7 +87,7 @@ export default class UserStore {
     let errorMessage = 'Cannot get user';
     try {
       const connection = await Client.connect();
-      const sql = `SELECT * FROM users WHERE id = ${id} `;
+      const sql = `SELECT * FROM users WHERE id = ${id}`;
       const result = await connection.query(sql);
       connection.release();
       console.log(result.rowCount);
@@ -152,7 +152,7 @@ export default class UserStore {
         parseInt(process.env.SALT_ROUNDS as string)
       );
       console.log(user);
-      const userExists = await checkUserExists(user.user_email);
+      const userExists = await getUserByEmail(user.user_email);
       if (!userExists) return addUser(user);
       else {
         errorMessage = 'User already exists';

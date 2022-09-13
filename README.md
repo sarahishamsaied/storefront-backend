@@ -49,7 +49,7 @@ Upcoming simple online store using Typescript & PostgreSql.
 
 [Show Info](#get-user-response-json-format) : GET `/api/user/:id`
 
-[Show Info](#delete-user-response-json-format) : DELETE `/api/users/:id`
+[Show Info](#delete-user-response-json-format) : DELETE `/api/user/:id`
 
 ## Products
 

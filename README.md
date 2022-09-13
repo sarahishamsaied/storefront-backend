@@ -49,8 +49,6 @@ Upcoming simple online store using Typescript & PostgreSql.
 
 [Show Info](#get-user-response-json-format) : GET `/api/user/:id`
 
-[Show Info](#update-user-json-format) : PATCH `/api/users/:id`
-
 [Show Info](#delete-user-response-json-format) : DELETE `/api/users/:id`
 
 ## Products
@@ -107,14 +105,6 @@ Upcoming simple online store using Typescript & PostgreSql.
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJmaXJzdG5hbWUiOiJzYXJhaCIsImxhc3RuYW1lIjoiaGlzaGFtIiwidXNlcl9lbWFpbCI6InNhcmFoaXNoYW1AZ21haWwuY29tIiwidXNlcl9wYXNzd29yZCI6IlNhcmE2NTQzMjEifSwiaWF0IjoxNjYyOTI4Mzg0fQ.NxnvScykJNKCWo_PhOkiplIW0-KAcM3_rVHWpWt11QM"
     }
 
-### Update User JSON Format
-
-    {
-    "firstname": "test",
-    "lastname": "test",
-    "user_email": "updatedemail@gmail.com",
-    "user_password": "updatedPassword"
-    }
 
 ### Delete User Response JSON Format
 

@@ -25,17 +25,20 @@ const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
         res.status(400).json(error);
     }
 });
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const firstname = req.body.firstname;
+        const lastname = req.body.lastname;
+        const user_email = req.body.user_email;
+        const user_password = req.body.user_password;
         const user = {
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            user_email: req.body.user_email,
-            user_password: req.body.user_password,
+            firstname,
+            lastname,
+            user_email,
+            user_password,
         };
         const newUser = yield store.create(user);
         const token = jsonwebtoken_1.default.sign({ user: newUser }, process.env.TOKEN_SECRET);
@@ -58,7 +61,7 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.params;
+        const id = parseInt(req.params.id);
         const result = yield store.remove(id);
         res.status(200).json({
             status: 200,
@@ -73,23 +76,23 @@ const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             console.log('err' + err);
     }
 });
-const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.body;
-        console.log(id);
-        const result = yield store.update(id);
-        res.status(200).json({
-            status: 200,
-            message: 'succeess',
-        });
-    }
-    catch (error) {
-        if (error instanceof Error)
-            res.status(400).json({ status: 400, message: error.message });
-        else
-            console.log('err' + error);
-    }
-});
+//removing update temporarly
+// const update = async (req: Request, res: Response) => {
+//   try {
+//     const id: number = parseInt(req.params.id);
+//     console.log(id);
+//     const updated_user = await store.update(id);
+//     res.status(200).json({
+//       status: 200,
+//       message: 'succeess',
+//       updated_user,
+//     });
+//   } catch (error) {
+//     if (error instanceof Error)
+//       res.status(400).json({ status: 400, message: error.message });
+//     else console.log('err' + error);
+//   }
+// };
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_email, user_password } = req.body;
@@ -102,7 +105,6 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
         if (error instanceof Error)
             res.status(400).json({
                 message: error.message,
@@ -111,7 +113,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const show = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const id = req.params.id;
+        const id = parseInt(req.params.id);
         const user = yield store.getUser(id);
         const token = jsonwebtoken_1.default.sign({ user: user }, process.env.TOKEN_SECRET);
         res.json({
@@ -129,7 +131,7 @@ const userRoutes = (app) => {
     app.get('/api/user/:id', show);
     app.post('/api/auth/signup', create);
     app.delete('/api/user/:id', remove);
-    app.patch('/api/user/:id', update);
+    // app.patch('/api/user/:id', update);
     app.post('/api/auth/signin', login);
 };
 exports.default = userRoutes;

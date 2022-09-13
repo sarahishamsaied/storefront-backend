@@ -26,21 +26,32 @@ const orderRoutes = (app) => {
 };
 exports.orderRoutes = orderRoutes;
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield store.index();
-    res.json({
-        response,
-    });
-});
-const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = req.body.userId;
-        const response = yield store.create(userId, order_model_1.Status.ACTIVE);
+        const orders = yield store.index();
+        const token = jsonwebtoken_1.default.sign({ orders }, process.env.TOKEN_SECRET);
         res.json({
-            response,
+            message: 'success',
+            token,
         });
     }
     catch (error) {
-        console.log(error);
+        if (error instanceof Error)
+            res.status(400).json({
+                message: error.message,
+            });
+    }
+});
+const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = parseInt(req.body.user_id);
+        const response = yield store.create(userId, order_model_1.Status.ACTIVE);
+        const token = jsonwebtoken_1.default.sign({ response }, process.env.TOKEN_SECRET);
+        res.json({
+            message: 'success',
+            token,
+        });
+    }
+    catch (error) {
         if (error instanceof Error)
             res.status(500).json({
                 status: 500,
@@ -59,7 +70,6 @@ const show = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
         if (error instanceof Error)
             res.status(400).json({
                 message: error.message,
@@ -76,7 +86,6 @@ const completeOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     catch (error) {
-        console.log(error);
         if (error instanceof Error)
             res.status(400).json({
                 status: 400,
@@ -86,13 +95,12 @@ const completeOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 const showUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = req.params.uid;
+        const userId = parseInt(req.params.uid);
         const orders = yield store.showUserOrders(userId);
         const token = jsonwebtoken_1.default.sign({ orders }, process.env.TOKEN_SECRET);
-        res.json({ token });
+        res.json({ message: 'success', token });
     }
     catch (error) {
-        console.log(error);
         if (error instanceof Error)
             res.status(500).json({
                 status: 500,
@@ -102,12 +110,16 @@ const showUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 const addProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const orderId = req.params.id;
-        const productId = req.body.productId;
+        const orderId = parseInt(req.params.id);
+        const productId = req.body.product_id;
         const quantity = parseInt(req.body.quantity);
         console.log(orderId, productId, quantity);
         const addedProduct = yield store.addProduct(orderId, quantity, productId);
-        res.json(addedProduct);
+        const token = jsonwebtoken_1.default.sign({ addedProduct }, process.env.TOKEN_SECRET);
+        res.json({
+            token,
+            message: 'success',
+        });
     }
     catch (error) {
         if (error instanceof Error)

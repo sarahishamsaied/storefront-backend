@@ -14,14 +14,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const index_1 = __importDefault(require("../index"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const request = (0, supertest_1.default)(index_1.default);
 describe('Testing orders', () => {
-    it('Should return an error when order id is not found', () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield request.get('/api/order/1000');
-        expect(response.body.message).toBe('Cannot find order with id = 1000');
+    beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
+        let decodedUser;
+        const userData = {
+            firstname: 'test',
+            lastname: 'order handler',
+            user_email: 'testorderhandler@test.com',
+            user_password: 'testorderhandler',
+        };
+        const productData = {
+            productname: 'dummy product',
+            category: 'category',
+            price: 12,
+        };
+        const { body: responseBody } = yield request
+            .post('/api/auth/signup')
+            .send(userData);
+        const token = responseBody;
+        jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET, (err, decode) => {
+            decodedUser = decode;
+            console.log(decode);
+        });
     }));
-    it('Should return an error when user id is not found', () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield request.get('/api/orders/user/1000');
-        expect(response.body.message).toBe('Cannot find order with user id = 1000');
-    }));
+    let user_id;
+    it('Should return an error when order id is not found', () => {
+        request.get('/api/order/1000').then((res) => {
+            expect(res.body.message).toBe('Cannot find order with id = 1000');
+        });
+    });
+    it('Should return an error when user id is not found', () => {
+        request.get('/api/orders/user/1000').then((res) => {
+            expect(res.body.message).toBe('Cannot find order with user id = 1000');
+        });
+    });
+    afterAll(() => {
+        request.delete(`/api/user/1`);
+    });
 });

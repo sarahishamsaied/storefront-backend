@@ -28,13 +28,14 @@ const index = async (req: Request, res: Response): Promise<void> => {
 };
 const create = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: string = req.body.user_id;
+    const userId: number = parseInt(req.body.user_id);
     const response = await store.create(userId, Status.ACTIVE);
+    const token = jwt.sign({ response }, process.env.TOKEN_SECRET as string);
     res.json({
       message: 'success',
+      token,
     });
   } catch (error) {
-    console.log(error);
     if (error instanceof Error)
       res.status(500).json({
         status: 500,
@@ -52,7 +53,6 @@ const show = async (req: Request, res: Response): Promise<void> => {
       token,
     });
   } catch (error) {
-    console.log(error);
     if (error instanceof Error)
       res.status(400).json({
         message: error.message,
@@ -68,7 +68,6 @@ const completeOrder = async (req: Request, res: Response): Promise<void> => {
       message: 'success',
     });
   } catch (error) {
-    console.log(error);
     if (error instanceof Error)
       res.status(400).json({
         status: 400,
@@ -78,12 +77,11 @@ const completeOrder = async (req: Request, res: Response): Promise<void> => {
 };
 const showUserOrders = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: string = req.params.uid;
+    const userId: number = parseInt(req.params.uid);
     const orders = await store.showUserOrders(userId);
     const token = jwt.sign({ orders }, process.env.TOKEN_SECRET as string);
     res.json({ message: 'success', token });
   } catch (error) {
-    console.log(error);
     if (error instanceof Error)
       res.status(500).json({
         status: 500,
@@ -93,16 +91,20 @@ const showUserOrders = async (req: Request, res: Response): Promise<void> => {
 };
 const addProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const orderId: string = req.params.id;
+    const orderId: number = parseInt(req.params.id);
     const productId: string = req.body.product_id;
     const quantity: number = parseInt(req.body.quantity);
     console.log(orderId, productId, quantity);
     const addedProduct = await store.addProduct(orderId, quantity, productId);
+    const token = jwt.sign(
+      { addedProduct },
+      process.env.TOKEN_SECRET as string
+    );
     res.json({
+      token,
       message: 'success',
     });
   } catch (error) {
-    console.log(error);
     if (error instanceof Error)
       res.status(500).json({
         status: 500,

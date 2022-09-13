@@ -1,11 +1,16 @@
 import Client from '../../Database/database';
 
-export type Product = {
+export interface BaseProduct {
+  productname: string;
+  price: number;
+  category: string;
+}
+export interface Product extends BaseProduct {
   id: number;
   productname: string;
   price: number;
   category: string;
-};
+}
 const checkEmpty = (str: string) => {
   return str.length > 0 ? false : true;
 };
@@ -20,17 +25,18 @@ export default class ProductStore {
       throw new Error('Cannot get products');
     }
   }
-  async show(id: string): Promise<Product> {
+  async show(id: number): Promise<Product> {
     try {
       const connection = await Client.connect();
       const sql = `SELECT * FROM products where id = ${id}`;
       const result = await connection.query(sql);
       return result.rows[0];
     } catch (error) {
+      console.log(error);
       throw new Error('Cannot get user');
     }
   }
-  async create(product: Product): Promise<Product> {
+  async create(product: BaseProduct): Promise<Product> {
     let errorMessage = 'Cannot insert into products';
     try {
       const isNameEmpty: boolean = checkEmpty(product.productname);
@@ -41,10 +47,12 @@ export default class ProductStore {
         throw new Error(errorMessage);
       }
       const connection = await Client.connect();
-      const sql = `INSERT INTO products (productname,price,category) VALUES ('${product.productname}','${product.price}','${product.category}')`;
+      const sql = `INSERT INTO products (productname,price,category) VALUES ('${product.productname}',${product.price},'${product.category}') RETURNING *`;
       const addedProduct = await connection.query(sql);
+      console.log('added products', addedProduct.rows[0]);
       return addedProduct.rows[0];
     } catch (error) {
+      console.log(error);
       throw new Error(errorMessage);
     }
   }
@@ -58,16 +66,12 @@ export default class ProductStore {
       throw new Error('Cannot get products');
     }
   }
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     let errorMessage = 'Cannot delete product';
     try {
       const connection = await Client.connect();
       const sql = `DELETE FROM products where id = ${id}`;
       const result = await connection.query(sql);
-      console.log(
-        '================= ROW COUNT =======================',
-        result.rowCount
-      );
       if (result.rowCount === 0) {
         errorMessage = `Product with id = ${id} is not found`;
         throw new Error(errorMessage);

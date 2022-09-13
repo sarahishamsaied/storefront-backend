@@ -17,36 +17,32 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const store = new product_model_1.default();
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield store.index();
-        console.log('res is', response);
+        const products = yield store.index();
+        const token = jsonwebtoken_1.default.sign({ products }, process.env.TOKEN_SECRET);
         res.json({
-            data: response,
             message: 'success',
+            token,
         });
     }
     catch (err) {
-        console.log(err);
         res.status(400).json(err);
     }
 });
 const show = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.params;
-        const response = yield store.show(id);
-        console.log('res is ', response);
-        response
+        const id = parseInt(req.params.id);
+        const product = yield store.show(id);
+        const token = jsonwebtoken_1.default.sign({ product }, process.env.TOKEN_SECRET);
+        product
             ? res.json({
-                data: response,
                 message: 'success',
-                status: 200,
+                token,
             })
             : res.status(400).json({
                 message: 'Cannot find product',
-                status: 400,
             });
     }
     catch (error) {
-        console.log(error);
         res.status(400).json(error);
     }
 });
@@ -92,7 +88,7 @@ const showByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     try {
         const response = yield store.delete(id);
         console.log(response);

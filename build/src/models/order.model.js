@@ -29,7 +29,6 @@ class OrderStore {
                 return response.rows;
             }
             catch (error) {
-                console.log(error);
                 throw new Error('Cannot get orders');
             }
         });
@@ -49,7 +48,6 @@ class OrderStore {
                     return response.rows[0];
             }
             catch (error) {
-                console.log(error);
                 throw new Error(errorMessage);
             }
         });
@@ -59,17 +57,31 @@ class OrderStore {
             let errorMessage = 'Cannot complete order';
             try {
                 const connection = yield database_1.default.connect();
-                const sql = `UPDATE orders SET status = 'COMPLETE' where id = ${id}`;
+                const sql = `UPDATE orders SET status = 'COMPLETE' where id = ${id} RETURNING *`;
                 const response = yield connection.query(sql);
                 console.log(response);
                 if (response.rowCount === 0) {
                     errorMessage = `Cannot find order with id = ${id}`;
                     throw new Error(errorMessage);
                 }
+                return response.rows[0];
             }
             catch (error) {
-                console.log(error);
                 throw new Error(errorMessage);
+            }
+        });
+    }
+    updateUserId(uid, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const connection = yield database_1.default.connect();
+                const sql = `UPDATE orders SET user_id = ${uid} where id = ${id} RETURNING *`;
+                const response = yield connection.query(sql);
+                connection.release();
+                return response.rows[0];
+            }
+            catch (error) {
+                throw new Error('Cannot update order');
             }
         });
     }
@@ -87,7 +99,6 @@ class OrderStore {
                 return orders.rows;
             }
             catch (error) {
-                console.log(error);
                 throw new Error(errorMessage);
             }
         });
@@ -96,13 +107,13 @@ class OrderStore {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const connection = yield database_1.default.connect();
-                const sql = `INSERT INTO order_product (quantity,order_id,product_id) VALUES (${quantity}, ${order_id} , ${product_id})`;
+                const sql = `INSERT INTO order_product (quantity,order_id,product_id) VALUES (${quantity}, ${order_id} , ${product_id}) RETURNING *`;
                 const response = yield connection.query(sql);
-                const order = response.rows[0];
-                console.log(order);
+                console.log('join table', response);
+                return response.rows[0];
             }
             catch (error) {
-                console.log(error);
+                throw new Error('cannot add product');
             }
         });
     }
@@ -111,10 +122,9 @@ class OrderStore {
             try {
                 console.log(status);
                 const connection = yield database_1.default.connect();
-                const sql = `INSERT INTO orders (user_id,status) VALUES (${user_id}, '${Status.ACTIVE}')`;
+                const sql = `INSERT INTO orders (user_id,status) VALUES (${user_id}, '${Status.ACTIVE}') RETURNING *`;
                 const response = yield connection.query(sql);
-                const order = response.rows[0];
-                console.log(order);
+                return response.rows[0];
             }
             catch (error) {
                 console.log(error);

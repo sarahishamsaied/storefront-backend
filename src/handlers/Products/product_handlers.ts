@@ -17,7 +17,7 @@ const index = async (req: Request, res: Response): Promise<void> => {
 };
 const show = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id: number = parseInt(req.params.id);
     const product = await store.show(id);
     const token = jwt.sign({ product }, process.env.TOKEN_SECRET as string);
     product
@@ -72,7 +72,7 @@ const showByCategory = async (req: Request, res: Response): Promise<void> => {
   }
 };
 const remove = async (req: Request, res: Response): Promise<void> => {
-  const id: string = req.params.id;
+  const id: number = parseInt(req.params.id);
   try {
     const response = await store.delete(id);
     console.log(response);

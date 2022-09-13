@@ -1,8 +1,13 @@
 import Client from '../../Database/database';
-export type Order = {
+export interface BaseOrder {
   user_id: number;
   status: Status;
-};
+}
+export interface Order extends BaseOrder {
+  id: number;
+  user_id: number;
+  status: Status;
+}
 export enum Status {
   ACTIVE = 'ACTIVE',
   COMPLETE = 'COMPLETE',
@@ -32,22 +37,34 @@ export class OrderStore {
       throw new Error(errorMessage);
     }
   }
-  async completeOrder(id: string): Promise<void> {
+  async completeOrder(id: string): Promise<BaseOrder> {
     let errorMessage = 'Cannot complete order';
     try {
       const connection = await Client.connect();
-      const sql = `UPDATE orders SET status = 'COMPLETE' where id = ${id}`;
+      const sql = `UPDATE orders SET status = 'COMPLETE' where id = ${id} RETURNING *`;
       const response = await connection.query(sql);
       console.log(response);
       if (response.rowCount === 0) {
         errorMessage = `Cannot find order with id = ${id}`;
         throw new Error(errorMessage);
       }
+      return response.rows[0];
     } catch (error) {
       throw new Error(errorMessage);
     }
   }
-  async showUserOrders(uid: string): Promise<Order[]> {
+  async updateUserId(uid: number, id: number): Promise<BaseOrder> {
+    try {
+      const connection = await Client.connect();
+      const sql = `UPDATE orders SET user_id = ${uid} where id = ${id} RETURNING *`;
+      const response = await connection.query(sql);
+      connection.release();
+      return response.rows[0];
+    } catch (error) {
+      throw new Error('Cannot update order');
+    }
+  }
+  async showUserOrders(uid: number): Promise<Order[]> {
     let errorMessage = 'Cannot show orders';
     try {
       const connection = await Client.connect();
@@ -63,29 +80,27 @@ export class OrderStore {
     }
   }
   async addProduct(
-    order_id: string,
+    order_id: number,
     quantity: number,
     product_id: string
-  ): Promise<void> {
+  ): Promise<BaseOrder> {
     try {
       const connection = await Client.connect();
-      const sql = `INSERT INTO order_product (quantity,order_id,product_id) VALUES (${quantity}, ${order_id} , ${product_id})`;
+      const sql = `INSERT INTO order_product (quantity,order_id,product_id) VALUES (${quantity}, ${order_id} , ${product_id}) RETURNING *`;
       const response = await connection.query(sql);
-      const order = response.rows[0];
-      console.log(order);
+      console.log('join table', response);
+      return response.rows[0];
     } catch (error) {
-      console.log(error);
       throw new Error('cannot add product');
     }
   }
-  async create(user_id: string, status: Status): Promise<void> {
+  async create(user_id: number, status: Status): Promise<Order> {
     try {
       console.log(status);
       const connection = await Client.connect();
-      const sql = `INSERT INTO orders (user_id,status) VALUES (${user_id}, '${Status.ACTIVE}')`;
+      const sql = `INSERT INTO orders (user_id,status) VALUES (${user_id}, '${Status.ACTIVE}') RETURNING *`;
       const response = await connection.query(sql);
-      const order = response.rows[0];
-      console.log(order);
+      return response.rows[0];
     } catch (error) {
       console.log(error);
       throw new Error('Cannot add order');

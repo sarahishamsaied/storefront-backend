@@ -18,7 +18,14 @@ const checkEmpty = (str) => {
     console.log(str.length);
     return str.length > 0 ? false : true;
 };
-const checkUserExists = (email) => __awaiter(void 0, void 0, void 0, function* () {
+const checkUserExists = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const connection = yield database_1.default.connect();
+    const sql = `SELECT * FROM users WHERE id = '${id}'`;
+    const result = yield connection.query(sql);
+    connection.release();
+    return result.rows.length > 0 ? true : false;
+});
+const checkUserExistsByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const connection = yield database_1.default.connect();
     const sql = `SELECT * FROM users WHERE user_email = '${email}'`;
     const result = yield connection.query(sql);
@@ -34,38 +41,19 @@ const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* ()
         return result.rows[0];
     }
     catch (error) {
-        console.log(error);
         throw new Error('Error getting user');
     }
 });
 const addUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const connection = yield database_1.default.connect();
-        const sql = `INSERT INTO users (firstname,lastname,user_email,user_password) VALUES ('${user.firstname}','${user.lastname}','${user.user_email}' ,'${user.user_password}') `;
-        const result = yield connection.query(sql);
+        const sql = `INSERT INTO users (firstname,lastname,user_email,user_password) VALUES ('${user.firstname}','${user.lastname}','${user.user_email}' ,'${user.user_password}') RETURNING * `;
+        const { rows } = yield connection.query(sql);
         connection.release();
-        return user;
+        return rows[0];
     }
     catch (error) {
-        console.log(error);
         throw new Error('Cannot add user');
-    }
-});
-const authenticate = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const foundUser = yield getUserByEmail(email);
-        console.log(foundUser);
-        console.log('---------------------------- passwords are =======================', password, foundUser.user_password);
-        const isEqual = yield bcrypt_1.default.compare(password, foundUser.user_password);
-        console.log(isEqual);
-        if (isEqual)
-            return true;
-        else
-            return false;
-    }
-    catch (error) {
-        console.log(error);
-        throw new Error('error');
     }
 });
 const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -75,6 +63,42 @@ const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(result);
 });
 class UserStore {
+    constructor() {
+        this.authenticate = (email, password) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const foundUser = yield getUserByEmail(email);
+                console.log(foundUser);
+                const isEqual = yield bcrypt_1.default.compare(password, foundUser.user_password);
+                console.log(isEqual);
+                if (isEqual)
+                    return true;
+                else
+                    return false;
+            }
+            catch (error) {
+                throw new Error('error');
+            }
+        });
+        // async update(id: number): Promise<User> {
+        //   let errorMessage = 'An error occured';
+        //   try {
+        //     const connection = await Client.connect();
+        //     const user = await this.getUser(id);
+        //     if (!user) {
+        //       errorMessage = 'User does not exist';
+        //       throw new Error(errorMessage);
+        //     }
+        //     const orderStore = new OrderStore();
+        //     const orders = orderStore.(id)
+        //     const sql = `UPDATE users SET firstname = '${user.firstname}', lastname = '${user.lastname}', user_email = '${user.user_email}', user_password = '${user.user_password}' WHERE id = ${id} RETURNING * `;
+        //     const result = await connection.query(sql);
+        //     return result.rows[0];
+        //   } catch (e) {
+        //     console.log(e);
+        //     throw new Error(errorMessage);
+        //   }
+        // }
+    }
     index() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -85,7 +109,6 @@ class UserStore {
                 return result.rows;
             }
             catch (error) {
-                console.log(error);
                 throw new Error('Cannot get users');
             }
         });
@@ -95,7 +118,7 @@ class UserStore {
             let errorMessage = 'Cannot get user';
             try {
                 const connection = yield database_1.default.connect();
-                const sql = `SELECT * FROM users WHERE id = ${id} LIMIT 1`;
+                const sql = `SELECT * FROM users WHERE id = ${id}`;
                 const result = yield connection.query(sql);
                 connection.release();
                 console.log(result.rowCount);
@@ -107,7 +130,6 @@ class UserStore {
                     return result.rows[0];
             }
             catch (error) {
-                console.log(error);
                 throw new Error(errorMessage);
             }
         });
@@ -116,19 +138,12 @@ class UserStore {
         return __awaiter(this, void 0, void 0, function* () {
             let errorMessage = 'Internal Server Error';
             try {
-                const doesExist = yield checkUserExists(email);
+                const doesExist = yield checkUserExistsByEmail(email);
                 if (doesExist) {
-                    const res = yield authenticate(email, password);
+                    const res = yield this.authenticate(email, password);
                     if (res) {
                         const user = yield getUserByEmail(email);
-                        console.log(user.firstname);
-                        const obj = {
-                            firstname: user.firstname,
-                            lastname: user.lastname,
-                            user_email: user.user_email,
-                        };
-                        console.log(obj);
-                        return obj;
+                        return user;
                     }
                     else {
                         errorMessage = 'Incorrect Password';
@@ -141,7 +156,6 @@ class UserStore {
                 }
             }
             catch (error) {
-                console.log(error);
                 throw new Error(errorMessage);
             }
         });
@@ -164,8 +178,7 @@ class UserStore {
                     throw new Error(errorMessage);
                 }
                 user.user_password = bcrypt_1.default.hashSync(user.user_password, parseInt(process.env.SALT_ROUNDS));
-                console.log(user);
-                const userExists = yield checkUserExists(user.user_email);
+                const userExists = yield getUserByEmail(user.user_email);
                 if (!userExists)
                     return addUser(user);
                 else {
@@ -174,7 +187,6 @@ class UserStore {
                 }
             }
             catch (error) {
-                console.log(error);
                 throw new Error(errorMessage);
             }
         });
@@ -192,26 +204,6 @@ class UserStore {
                 }
             }
             catch (error) {
-                throw new Error(errorMessage);
-            }
-        });
-    }
-    update(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let errorMessage = 'An error occured';
-            try {
-                const connection = yield database_1.default.connect();
-                const user = yield this.getUser(id);
-                if (!user) {
-                    errorMessage = 'User does not exist';
-                    throw new Error(errorMessage);
-                }
-                const sql = `UPDATE users SET firstname = '${user.firstname}', lastname = '${user.lastname}' email = '${user.user_email}', password = '${user.user_password}' WHERE id = ${id}; `;
-                const result = yield connection.query(sql);
-                console.log(result.rowCount);
-            }
-            catch (e) {
-                console.log(e);
                 throw new Error(errorMessage);
             }
         });

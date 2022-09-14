@@ -25,30 +25,36 @@ class OrderStore {
             try {
                 const connection = yield database_1.default.connect();
                 const sql = 'SELECT * FROM orders';
-                const response = yield connection.query(sql);
-                return response.rows;
+                const { rows } = yield connection.query(sql);
+                const orders = [];
+                const orderProductsSql = `SELECT product_id, quantity FROM order_product WHERE order_id=($1)`;
+                for (const order of rows) {
+                    const { rows: orderProductsRows } = yield connection.query(orderProductsSql, [order.id]);
+                    orders.push(Object.assign(Object.assign({}, order), { products: orderProductsRows }));
+                }
+                connection.release();
+                return orders;
             }
             catch (error) {
+                console.log(error);
                 throw new Error('Cannot get orders');
             }
         });
     }
     show(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            let errorMessage = 'Cannot get order';
             try {
+                const sql = 'SELECT * FROM orders WHERE id=($1)';
                 const connection = yield database_1.default.connect();
-                const sql = `SELECT * FROM orders where id = ${id}`;
-                const response = yield connection.query(sql);
-                if (response.rows.length === 0) {
-                    errorMessage = `Cannot find order with id = ${id}`;
-                    throw new Error(errorMessage);
-                }
-                else
-                    return response.rows[0];
+                const { rows } = yield connection.query(sql, [id]);
+                const order = rows[0];
+                const orderProductsSql = 'SELECT product_id, quantity FROM order_product WHERE order_id=($1)';
+                const { rows: orderProductRows } = yield connection.query(orderProductsSql, [id]);
+                connection.release();
+                return Object.assign(Object.assign({}, order), { products: orderProductRows });
             }
             catch (error) {
-                throw new Error(errorMessage);
+                throw new Error('Cannot get order');
             }
         });
     }
@@ -71,38 +77,6 @@ class OrderStore {
             }
         });
     }
-    updateUserId(uid, id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const connection = yield database_1.default.connect();
-                const sql = `UPDATE orders SET user_id = ${uid} where id = ${id} RETURNING *`;
-                const response = yield connection.query(sql);
-                connection.release();
-                return response.rows[0];
-            }
-            catch (error) {
-                throw new Error('Cannot update order');
-            }
-        });
-    }
-    showUserOrders(uid) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let errorMessage = 'Cannot show orders';
-            try {
-                const connection = yield database_1.default.connect();
-                const sql = `SELECT * FROM orders where user_id = ${uid}`;
-                const orders = yield connection.query(sql);
-                if (orders.rowCount === 0) {
-                    errorMessage = `Cannot find order with user id = ${uid}`;
-                    throw new Error(errorMessage);
-                }
-                return orders.rows;
-            }
-            catch (error) {
-                throw new Error(errorMessage);
-            }
-        });
-    }
     addProduct(order_id, quantity, product_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -117,14 +91,27 @@ class OrderStore {
             }
         });
     }
-    create(user_id, status) {
+    create(order) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log(status);
+                const { products, user_id } = order;
                 const connection = yield database_1.default.connect();
                 const sql = `INSERT INTO orders (user_id,status) VALUES (${user_id}, '${Status.ACTIVE}') RETURNING *`;
-                const response = yield connection.query(sql);
-                return response.rows[0];
+                const { rows } = yield connection.query(sql);
+                const orderResponse = rows[0];
+                const orderProductsSql = 'INSERT INTO order_product (order_id,product_id,quantity) VALUES ($1,$2,$3) RETURNING product_id,quantity';
+                const orderProducts = [];
+                for (const product of products) {
+                    const { product_id, quantity } = product;
+                    const { rows } = yield connection.query(orderProductsSql, [
+                        orderResponse.id,
+                        product_id,
+                        quantity,
+                    ]);
+                    orderProducts.push(rows[0]);
+                }
+                connection.release();
+                return Object.assign(Object.assign({}, orderResponse), { products: orderProducts });
             }
             catch (error) {
                 console.log(error);

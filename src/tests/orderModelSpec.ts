@@ -1,57 +1,79 @@
-import { Order, OrderStore, Status } from '../models/order.model';
-import ProductStore, { Product } from '../models/product.model';
-import UserStore, { User } from '../models/user.model';
-const userStore = new UserStore();
-const store = new OrderStore();
-describe('Order Model', () => {
+import { BaseUser, User } from '../models/user.model';
+import UserStore from '../models/user.model';
+
+const UserStoreInstance = new UserStore();
+
+describe('User Model', () => {
+  const user: BaseUser = {
+    user_email: 'hansmeier',
+    firstname: 'Hans',
+    lastname: 'Meier',
+    user_password: 'password123',
+  };
+
+  async function createUser(user: BaseUser) {
+    return UserStoreInstance.create(user);
+  }
+
+  async function deleteUser(id: number) {
+    return UserStoreInstance.remove(id);
+  }
+
   it('should have an index method', () => {
-    expect(store.index).toBeDefined();
+    expect(UserStoreInstance.index).toBeDefined();
   });
 
   it('should have a show method', () => {
-    expect(store.show).toBeDefined();
+    expect(UserStoreInstance.getUser).toBeDefined();
   });
 
   it('should have a create method', () => {
-    expect(store.create).toBeDefined();
+    expect(UserStoreInstance.create).toBeDefined();
   });
 
-  it('should have a show users orders method', () => {
-    expect(store.showUserOrders).toBeDefined();
+  it('should have a remove method', () => {
+    expect(UserStoreInstance.remove).toBeDefined();
   });
 
-  it('should have an add product to order method', () => {
-    expect(store.addProduct).toBeDefined();
-  });
-});
+  it('create method should create a user', async () => {
+    const createdUser: User = await createUser(user);
 
-// ================ Testing Mehtods =======================
+    if (createdUser) {
+      const { user_email, firstname, lastname } = createdUser;
 
-describe('Order Model', () => {
-  let user_id: number, product_id: number;
-  beforeAll(async () => {
-    const user: User = await userStore.create({
-      user_email: 'user@gmail.com',
-      user_password: 'userpass',
-      firstname: 'user firstname',
-      lastname: 'user lastname',
-    });
-    user_id = user.id;
-    const productStore = new ProductStore();
-    const product: Product = await productStore.create({
-      productname: 'testproduct',
-      price: 12,
-      category: 'category',
-    });
-    product_id = product.id;
+      expect(user_email).toBe(user.user_email);
+      expect(firstname).toBe(user.firstname);
+      expect(lastname).toBe(user.lastname);
+    }
+
+    await deleteUser(createdUser.id);
   });
-  //   it('create method should create an order', async () => {
-  //     const addedOrder = await store.create(user_id, Status.ACTIVE);
-  //     console.log(addedOrder);
-  //     expect(addedOrder).toEqual({
-  //       id: addedOrder.id,
-  //       user_id: addedOrder.user_id,
-  //       status: Status.ACTIVE,
-  //     });
-  //   });
+
+  it('index method should return a list of users', async () => {
+    const createdUser: User = await createUser(user);
+    const userList = await UserStoreInstance.index();
+
+    expect(userList).toEqual([createdUser]);
+
+    await deleteUser(createdUser.id);
+  });
+
+  it('show method should return the correct users', async () => {
+    const createdUser: User = await createUser(user);
+    const userFromDb = await UserStoreInstance.getUser(createdUser.id);
+
+    expect(userFromDb).toEqual(createdUser);
+
+    await deleteUser(createdUser.id);
+  });
+
+  it('remove method should remove the user', async () => {
+    const createdUser: User = await createUser(user);
+
+    await deleteUser(createdUser.id);
+
+    const userList = await UserStoreInstance.index();
+
+    expect(userList).toEqual([]);
+  });
 });

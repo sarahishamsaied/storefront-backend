@@ -13,15 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const product_model_1 = __importDefault(require("../../models/product.model"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const token_verification_1 = require("../../middlewares/token-verification");
 const store = new product_model_1.default();
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const products = yield store.index();
-        const token = jsonwebtoken_1.default.sign({ products }, process.env.TOKEN_SECRET);
         res.json({
             message: 'success',
-            token,
+            products,
         });
     }
     catch (err) {
@@ -32,11 +31,10 @@ const show = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = parseInt(req.params.id);
         const product = yield store.show(id);
-        const token = jsonwebtoken_1.default.sign({ product }, process.env.TOKEN_SECRET);
         product
             ? res.json({
                 message: 'success',
-                token,
+                product,
             })
             : res.status(400).json({
                 message: 'Cannot find product',
@@ -50,9 +48,8 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = req.body;
         const product = yield store.create(user);
-        const token = jsonwebtoken_1.default.sign({ product }, process.env.TOKEN_SECRET);
         res.json({
-            token,
+            product,
             status: 'success',
         });
     }
@@ -105,9 +102,9 @@ const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const productRoutes = (app) => {
     app.get('/api/products', index);
-    app.post('/api/product', create);
+    app.post('/api/product', token_verification_1.checkAuthHeader, create);
     app.get('/api/product/:id', show);
-    app.delete('/api/product/:id', remove);
-    app.get('/api/product/category/:cat', showByCategory);
+    app.delete('/api/product/:id', token_verification_1.checkAuthHeader, remove);
+    app.get('/api/product/category/:cat', token_verification_1.checkAuthHeader, showByCategory);
 };
 exports.default = productRoutes;

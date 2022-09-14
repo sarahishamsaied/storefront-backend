@@ -14,17 +14,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_model_1 = __importDefault(require("../../models/user.model"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const token_verification_1 = require("../../middlewares/token-verification");
 const store = new user_model_1.default();
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield store.index();
-        const token = jsonwebtoken_1.default.sign({ users: users }, process.env.TOKEN_SECRET);
         res.json({
             status: 200,
-            token,
+            users,
         });
     }
     catch (error) {
+        console.log(error);
         res.status(400).json(error);
     }
 });
@@ -34,6 +35,13 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const lastname = req.body.lastname;
         const user_email = req.body.user_email;
         const user_password = req.body.user_password;
+        if (firstname === undefined ||
+            lastname === undefined ||
+            user_email === undefined ||
+            user_password === undefined) {
+            res.status(400).send('All parameters are required');
+            return;
+        }
         const user = {
             firstname,
             lastname,
@@ -42,6 +50,7 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         };
         const newUser = yield store.create(user);
         const token = jsonwebtoken_1.default.sign({ user: newUser }, process.env.TOKEN_SECRET);
+        console.log(token);
         res.json({
             status: 200,
             message: 'success',
@@ -49,14 +58,8 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        let message;
-        if (error instanceof Error)
-            message = error.message;
-        else
-            message = String(error);
-        res.status(400).json({
-            message,
-        });
+        console.log(error);
+        res.status(400).json(error);
     }
 });
 const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -64,16 +67,12 @@ const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const id = parseInt(req.params.id);
         const result = yield store.remove(id);
         res.status(200).json({
-            status: 200,
             removed: 'success',
-            result,
         });
     }
-    catch (err) {
-        if (err instanceof Error)
-            res.status(400).json({ status: 400, message: err.message });
-        else
-            console.log('err' + err);
+    catch (error) {
+        console.log(error);
+        res.status(400).json(error);
     }
 });
 //removing update temporarly
@@ -99,12 +98,12 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const foundUser = yield store.login(user_email, user_password);
         const token = jsonwebtoken_1.default.sign({ user: foundUser }, process.env.TOKEN_SECRET);
         res.json({
-            status: 200,
             message: 'succeess',
             token,
         });
     }
     catch (error) {
+        console.log(error);
         if (error instanceof Error)
             res.status(400).json({
                 message: error.message,
@@ -113,24 +112,27 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const show = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
+        if (id === undefined)
+            res.status(400).json({
+                message: 'missing id',
+            });
         const user = yield store.getUser(id);
-        const token = jsonwebtoken_1.default.sign({ user: user }, process.env.TOKEN_SECRET);
         res.json({
             status: 200,
-            token,
+            user,
         });
     }
     catch (error) {
-        if (error instanceof Error)
-            res.status(400).json({ message: error.message });
+        console.log(error);
+        res.status(400).json(error);
     }
 });
 const userRoutes = (app) => {
-    app.get('/api/users', index);
-    app.get('/api/user/:id', show);
+    app.get('/api/users', token_verification_1.checkAuthHeader, index);
+    app.get('/api/user/:id', token_verification_1.checkAuthHeader, show);
     app.post('/api/auth/signup', create);
-    app.delete('/api/user/:id', remove);
+    app.delete('/api/user/:id', token_verification_1.checkAuthHeader, remove);
     // app.patch('/api/user/:id', update);
     app.post('/api/auth/signin', login);
 };

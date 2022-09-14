@@ -12,54 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const order_model_1 = require("../models/order.model");
-const product_model_1 = __importDefault(require("../models/product.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
-const userStore = new user_model_1.default();
-const store = new order_model_1.OrderStore();
-describe('Order Model', () => {
+const UserStoreInstance = new user_model_1.default();
+describe('User Model', () => {
+    const user = {
+        user_email: 'hansmeier',
+        firstname: 'Hans',
+        lastname: 'Meier',
+        user_password: 'password123',
+    };
+    function createUser(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return UserStoreInstance.create(user);
+        });
+    }
+    function deleteUser(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return UserStoreInstance.remove(id);
+        });
+    }
     it('should have an index method', () => {
-        expect(store.index).toBeDefined();
+        expect(UserStoreInstance.index).toBeDefined();
     });
     it('should have a show method', () => {
-        expect(store.show).toBeDefined();
+        expect(UserStoreInstance.getUser).toBeDefined();
     });
     it('should have a create method', () => {
-        expect(store.create).toBeDefined();
+        expect(UserStoreInstance.create).toBeDefined();
     });
-    it('should have a show users orders method', () => {
-        expect(store.showUserOrders).toBeDefined();
+    it('should have a remove method', () => {
+        expect(UserStoreInstance.remove).toBeDefined();
     });
-    it('should have an add product to order method', () => {
-        expect(store.addProduct).toBeDefined();
-    });
-});
-// ================ Testing Mehtods =======================
-describe('Order Model', () => {
-    let user_id, product_id;
-    beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
-        const user = yield userStore.create({
-            user_email: 'user@gmail.com',
-            user_password: 'userpass',
-            firstname: 'user firstname',
-            lastname: 'user lastname',
-        });
-        user_id = user.id;
-        const productStore = new product_model_1.default();
-        const product = yield productStore.create({
-            productname: 'testproduct',
-            price: 12,
-            category: 'category',
-        });
-        product_id = product.id;
+    it('create method should create a user', () => __awaiter(void 0, void 0, void 0, function* () {
+        const createdUser = yield createUser(user);
+        if (createdUser) {
+            const { user_email, firstname, lastname } = createdUser;
+            expect(user_email).toBe(user.user_email);
+            expect(firstname).toBe(user.firstname);
+            expect(lastname).toBe(user.lastname);
+        }
+        yield deleteUser(createdUser.id);
     }));
-    //   it('create method should create an order', async () => {
-    //     const addedOrder = await store.create(user_id, Status.ACTIVE);
-    //     console.log(addedOrder);
-    //     expect(addedOrder).toEqual({
-    //       id: addedOrder.id,
-    //       user_id: addedOrder.user_id,
-    //       status: Status.ACTIVE,
-    //     });
-    //   });
+    it('index method should return a list of users', () => __awaiter(void 0, void 0, void 0, function* () {
+        const createdUser = yield createUser(user);
+        const userList = yield UserStoreInstance.index();
+        expect(userList).toEqual([createdUser]);
+        yield deleteUser(createdUser.id);
+    }));
+    it('show method should return the correct users', () => __awaiter(void 0, void 0, void 0, function* () {
+        const createdUser = yield createUser(user);
+        const userFromDb = yield UserStoreInstance.getUser(createdUser.id);
+        expect(userFromDb).toEqual(createdUser);
+        yield deleteUser(createdUser.id);
+    }));
+    it('remove method should remove the user', () => __awaiter(void 0, void 0, void 0, function* () {
+        const createdUser = yield createUser(user);
+        yield deleteUser(createdUser.id);
+        const userList = yield UserStoreInstance.index();
+        expect(userList).toEqual([]);
+    }));
 });

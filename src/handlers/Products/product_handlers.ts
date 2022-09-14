@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 import express from 'express';
 import ProductStore from '../../models/product.model';
 import jwt from 'jsonwebtoken';
+import { checkAuthHeader } from '../../middlewares/token-verification';
 const store = new ProductStore();
 const index = async (req: Request, res: Response): Promise<void> => {
   try {
     const products = await store.index();
-    const token = jwt.sign({ products }, process.env.TOKEN_SECRET as string);
     res.json({
       message: 'success',
-      token,
+      products,
     });
   } catch (err) {
     res.status(400).json(err);
@@ -19,11 +19,10 @@ const show = async (req: Request, res: Response): Promise<void> => {
   try {
     const id: number = parseInt(req.params.id);
     const product = await store.show(id);
-    const token = jwt.sign({ product }, process.env.TOKEN_SECRET as string);
     product
       ? res.json({
           message: 'success',
-          token,
+          product,
         })
       : res.status(400).json({
           message: 'Cannot find product',
@@ -36,9 +35,8 @@ const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.body;
     const product = await store.create(user);
-    const token = jwt.sign({ product }, process.env.TOKEN_SECRET as string);
     res.json({
-      token,
+      product,
       status: 'success',
     });
   } catch (error) {
@@ -88,9 +86,9 @@ const remove = async (req: Request, res: Response): Promise<void> => {
 };
 const productRoutes = (app: express.Application) => {
   app.get('/api/products', index);
-  app.post('/api/product', create);
+  app.post('/api/product', checkAuthHeader, create);
   app.get('/api/product/:id', show);
-  app.delete('/api/product/:id', remove);
-  app.get('/api/product/category/:cat', showByCategory);
+  app.delete('/api/product/:id', checkAuthHeader, remove);
+  app.get('/api/product/category/:cat', checkAuthHeader, showByCategory);
 };
 export default productRoutes;

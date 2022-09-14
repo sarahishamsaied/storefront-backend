@@ -50,6 +50,7 @@ const addUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
         const sql = `INSERT INTO users (firstname,lastname,user_email,user_password) VALUES ('${user.firstname}','${user.lastname}','${user.user_email}' ,'${user.user_password}') RETURNING * `;
         const { rows } = yield connection.query(sql);
         connection.release();
+        console.log(rows[0]);
         return rows[0];
     }
     catch (error) {
@@ -168,12 +169,10 @@ class UserStore {
                 const isPasswordEmpty = checkEmpty(user.user_password);
                 const isFirstNameEmpty = checkEmpty(user.firstname);
                 const isLastNameEmpty = checkEmpty(user.lastname);
-                console.log(isEmailEmpty);
                 if (isEmailEmpty ||
                     isPasswordEmpty ||
                     isFirstNameEmpty ||
                     isLastNameEmpty) {
-                    console.log('invalid');
                     errorMessage = 'All fields must be filled';
                     throw new Error(errorMessage);
                 }

@@ -1,7 +1,12 @@
 import Client from '../../Database/database';
 export interface BaseOrder {
+  products: OrderProduct[];
   user_id: number;
   status: Status;
+}
+export interface OrderProduct {
+  product_id: number;
+  quantity: number;
 }
 export interface Order extends BaseOrder {
   id: number;
@@ -17,24 +22,45 @@ export class OrderStore {
     try {
       const connection = await Client.connect();
       const sql = 'SELECT * FROM orders';
-      const response = await connection.query(sql);
-      return response.rows;
+      const { rows } = await connection.query(sql);
+      const orders = [];
+      const orderProductsSql = `SELECT product_id, quantity FROM order_product WHERE order_id=($1)`;
+      for (const order of rows) {
+        const { rows: orderProductsRows } = await connection.query(
+          orderProductsSql,
+          [order.id]
+        );
+        orders.push({
+          ...order,
+          products: orderProductsRows,
+        });
+      }
+      connection.release();
+      return orders;
     } catch (error) {
+      console.log(error);
       throw new Error('Cannot get orders');
     }
   }
-  async show(id: string): Promise<Order> {
-    let errorMessage = 'Cannot get order';
+  async show(id: number): Promise<Order> {
     try {
+      const sql = 'SELECT * FROM orders WHERE id=($1)';
       const connection = await Client.connect();
-      const sql = `SELECT * FROM orders where id = ${id}`;
-      const response = await connection.query(sql);
-      if (response.rows.length === 0) {
-        errorMessage = `Cannot find order with id = ${id}`;
-        throw new Error(errorMessage);
-      } else return response.rows[0];
+      const { rows } = await connection.query(sql, [id]);
+      const order = rows[0];
+      const orderProductsSql =
+        'SELECT product_id, quantity FROM order_product WHERE order_id=($1)';
+      const { rows: orderProductRows } = await connection.query(
+        orderProductsSql,
+        [id]
+      );
+      connection.release();
+      return {
+        ...order,
+        products: orderProductRows,
+      };
     } catch (error) {
-      throw new Error(errorMessage);
+      throw new Error('Cannot get order');
     }
   }
   async completeOrder(id: string): Promise<BaseOrder> {
@@ -53,36 +79,10 @@ export class OrderStore {
       throw new Error(errorMessage);
     }
   }
-  async updateUserId(uid: number, id: number): Promise<BaseOrder> {
-    try {
-      const connection = await Client.connect();
-      const sql = `UPDATE orders SET user_id = ${uid} where id = ${id} RETURNING *`;
-      const response = await connection.query(sql);
-      connection.release();
-      return response.rows[0];
-    } catch (error) {
-      throw new Error('Cannot update order');
-    }
-  }
-  async showUserOrders(uid: number): Promise<Order[]> {
-    let errorMessage = 'Cannot show orders';
-    try {
-      const connection = await Client.connect();
-      const sql = `SELECT * FROM orders where user_id = ${uid}`;
-      const orders = await connection.query(sql);
-      if (orders.rowCount === 0) {
-        errorMessage = `Cannot find order with user id = ${uid}`;
-        throw new Error(errorMessage);
-      }
-      return orders.rows;
-    } catch (error) {
-      throw new Error(errorMessage);
-    }
-  }
   async addProduct(
     order_id: number,
     quantity: number,
-    product_id: string
+    product_id: number
   ): Promise<BaseOrder> {
     try {
       const connection = await Client.connect();
@@ -94,13 +94,30 @@ export class OrderStore {
       throw new Error('cannot add product');
     }
   }
-  async create(user_id: number, status: Status): Promise<Order> {
+  async create(order: BaseOrder): Promise<Order> {
     try {
-      console.log(status);
+      const { products, user_id } = order;
       const connection = await Client.connect();
       const sql = `INSERT INTO orders (user_id,status) VALUES (${user_id}, '${Status.ACTIVE}') RETURNING *`;
-      const response = await connection.query(sql);
-      return response.rows[0];
+      const { rows } = await connection.query(sql);
+      const orderResponse = rows[0];
+      const orderProductsSql =
+        'INSERT INTO order_product (order_id,product_id,quantity) VALUES ($1,$2,$3) RETURNING product_id,quantity';
+      const orderProducts = [];
+      for (const product of products) {
+        const { product_id, quantity } = product;
+        const { rows } = await connection.query(orderProductsSql, [
+          orderResponse.id,
+          product_id,
+          quantity,
+        ]);
+        orderProducts.push(rows[0]);
+      }
+      connection.release();
+      return {
+        ...orderResponse,
+        products: orderProducts,
+      };
     } catch (error) {
       console.log(error);
       throw new Error('Cannot add order');

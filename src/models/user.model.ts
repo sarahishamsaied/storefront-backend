@@ -47,6 +47,7 @@ const addUser = async (user: BaseUser): Promise<User> => {
     const sql = `INSERT INTO users (firstname,lastname,user_email,user_password) VALUES ('${user.firstname}','${user.lastname}','${user.user_email}' ,'${user.user_password}') RETURNING * `;
     const { rows } = await connection.query(sql);
     connection.release();
+    console.log(rows[0]);
     return rows[0];
   } catch (error) {
     throw new Error('Cannot add user');
@@ -127,14 +128,12 @@ export default class UserStore {
       const isPasswordEmpty: boolean = checkEmpty(user.user_password);
       const isFirstNameEmpty: boolean = checkEmpty(user.firstname);
       const isLastNameEmpty: boolean = checkEmpty(user.lastname);
-      console.log(isEmailEmpty);
       if (
         isEmailEmpty ||
         isPasswordEmpty ||
         isFirstNameEmpty ||
         isLastNameEmpty
       ) {
-        console.log('invalid');
         errorMessage = 'All fields must be filled';
         throw new Error(errorMessage);
       }

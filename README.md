@@ -47,15 +47,15 @@ Upcoming simple online store using Typescript & PostgreSql.
 
 [Show Info](#get-users-response-json-format) : GET `/api/users`
 
-[Show Info](#update-user-json-format) : PATCH `/api/users/:id`
+[Show Info](#get-user-response-json-format) : GET `/api/user/:id`
 
-[Show Info](#delete-user-response-json-format) : DELETE `/api/users/:id`
+[Show Info](#delete-user-response-json-format) : DELETE `/api/user/:id`
 
 ## Products
 
 [Show Info](#get-products-response-json-format) : GET `/api/products`
 
-[Show Info](#get-product-response-json-format) : GET `/api/product/id`
+[Show Info](#get-product-response-json-format) : GET `/api/product/:id`
 
 [Show Info](#delete-product-response-json-format) : DELETE `/api/product/:id`
 
@@ -65,7 +65,7 @@ Upcoming simple online store using Typescript & PostgreSql.
 
 [Show Info](#get-orders-response-json-format) : GET `/api/orders`
 
-[Show Info](#get-order-response-json-format) : GET `/api/order/id`
+[Show Info](#get-order-response-json-format) : GET `/api/order/:id`
 
 [Show Info](#add-order-json-format) : POST `/api/order`
 
@@ -97,15 +97,14 @@ Upcoming simple online store using Typescript & PostgreSql.
         "status": 200,
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VycyI6W3siaWQiOjEsImZpcnN0bmFtZSI6InNhcmFoIiwibGFzdG5hbWUiOiJoaXNoYW0iLCJ1c2VyX2VtYWlsIjoic2FyYWhpc2hhbUBnbWFpbC5jb20iLCJ1c2VyX3Bhc3N3b3JkIjoiU2FyYTY1NDMyMSJ9LHsiaWQiOjIsImZpcnN0bmFtZSI6InNhcmFoIiwibGFzdG5hbWUiOiJoaXNoYW0iLCJ1c2VyX2VtYWlsIjoic2FyYWhpc2hhbTJAZ21haWwuY29tIiwidXNlcl9wYXNzd29yZCI6IlNhcmE2NTQzMjEifSx7ImlkIjozLCJmaXJzdG5hbWUiOiJzYXJhaCIsImxhc3RuYW1lIjoiaGlzaGFtIiwidXNlcl9lbWFpbCI6InNhcmFoaXNoYW0zQGdtYWlsLmNvbSIsInVzZXJfcGFzc3dvcmQiOiIkMmIkMTAkaWJoRFBoblpVZWpmbWJ6MEIzTzRKdUUzQTRMd3NvQ1ZvdEV0N2toUE1VUjguQUZyN2F1ZmUifSx7ImlkIjo0LCJmaXJzdG5hbWUiOiJzYXJhc2Vlcm8iLCJsYXN0bmFtZSI6Imhpc2hhbSIsInVzZXJfZW1haWwiOiJzYXJhaGlzaGFtNUBnbWFpbC5jb20iLCJ1c2VyX3Bhc3N3b3JkIjoiJDJiJDEwJFpUeC5yOWhLa1dCQTFORFNnSjhERk9sblBFRFJZak8vNEIzQzluR1pVNVMwZFFyZ0JQbEtXIn0seyJpZCI6NSwiZmlyc3RuYW1lIjoic2FyYXNlZXJvIiwibGFzdG5hbWUiOiJoaXNoYW0iLCJ1c2VyX2VtYWlsIjoic2FyYWhpc2hhbTZAZ21haWwuY29tIiwidXNlcl9wYXNzd29yZCI6IiQyYiQxMCROTnRCbVBqZ0NFRk1lZ0FCcU5qVDllTDlCZkVKY3BCZ0pEMEF3T1ZvVUR6clJUWjhsRTJSTyJ9LHsiaWQiOjYsImZpcnN0bmFtZSI6InRlc3QiLCJsYXN0bmFtZSI6InRlc3QiLCJ1c2VyX2VtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJ1c2VyX3Bhc3N3b3JkIjoiJDJiJDEwJHMueTdacGVEUjVUbTNWYXhPQ0JnTGUvMlpvMmhGSVVuTlhVTkpKQmU4OWtoelZnZlhnSi5TIn1dLCJpYXQiOjE2NjI5Mjc4MDB9.NHti24DAhIfGyXKa32XDXhaTWfgTAtTmlyPE5P1IXas"
     }
-
-### Update User JSON Format
+    
+ ### Get User Response JSON Format
 
     {
-    "firstname": "test",
-    "lastname": "test",
-    "user_email": "updatedemail@gmail.com",
-    "user_password": "updatedPassword"
+        "status": 200,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJmaXJzdG5hbWUiOiJzYXJhaCIsImxhc3RuYW1lIjoiaGlzaGFtIiwidXNlcl9lbWFpbCI6InNhcmFoaXNoYW1AZ21haWwuY29tIiwidXNlcl9wYXNzd29yZCI6IlNhcmE2NTQzMjEifSwiaWF0IjoxNjYyOTI4Mzg0fQ.NxnvScykJNKCWo_PhOkiplIW0-KAcM3_rVHWpWt11QM"
     }
+
 
 ### Delete User Response JSON Format
 
@@ -114,12 +113,6 @@ Upcoming simple online store using Typescript & PostgreSql.
         "removed": "success"
     }
 
-### Get User Response JSON Format
-
-    {
-        "status": 200,
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJmaXJzdG5hbWUiOiJzYXJhaCIsImxhc3RuYW1lIjoiaGlzaGFtIiwidXNlcl9lbWFpbCI6InNhcmFoaXNoYW1AZ21haWwuY29tIiwidXNlcl9wYXNzd29yZCI6IlNhcmE2NTQzMjEifSwiaWF0IjoxNjYyOTI4Mzg0fQ.NxnvScykJNKCWo_PhOkiplIW0-KAcM3_rVHWpWt11QM"
-    }
 
 # Products
 

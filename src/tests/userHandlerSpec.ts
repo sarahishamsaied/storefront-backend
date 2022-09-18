@@ -1,13 +1,13 @@
 import supertest from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../index';
-import { BaseUser } from '../models/user.model';
+import { BaseUser, User } from '../models/user.model';
 const request = supertest(app);
 describe('User Handler', () => {
   const userData: BaseUser = {
-    user_email: 'hansmeier',
-    firstname: 'Hans',
-    lastname: 'Meier',
+    user_email: 'testtesttest',
+    firstname: 'test',
+    lastname: 'test',
     user_password: 'password123',
   };
 

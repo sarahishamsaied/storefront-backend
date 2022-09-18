@@ -144,7 +144,7 @@ export default class UserStore {
       const userExists = await getUserByEmail(user.user_email);
       if (!userExists) return addUser(user);
       else {
-        errorMessage = 'User already exists';
+        errorMessage = `User with email = ${user.user_email} already exists`;
         throw new Error(errorMessage);
       }
     } catch (error) {

@@ -1,12 +1,11 @@
 import { BaseUser, User } from '../models/user.model';
 import UserStore from '../models/user.model';
-
 const UserStoreInstance = new UserStore();
 
 describe('User Model', () => {
   const user: BaseUser = {
-    user_email: 'hansmeier',
-    firstname: 'Hans',
+    user_email: 'testuser',
+    firstname: 'testetste',
     lastname: 'Meier',
     user_password: 'password123',
   };

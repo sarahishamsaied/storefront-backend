@@ -69,6 +69,60 @@ Upcoming simple online store using Typescript & PostgreSql.
 
 [Show Info](#add-order-json-format) : POST `/api/order`
 
+### Database Port
+
+    DEFAULT PORT = 5432
+
+
+
+
+# Database Schemas
+
+## users
+
+Column        | Type    
+------------- | -------------
+id            | integer
+user_email    | VARCHAR(200)
+user_password | VARCHAR(1000)
+firstname     | VARCHAR(100)
+lastname      | VARCHAR(200)
+
+
+------------------------------------------
+
+
+## products
+
+Column      | Type         
+----------- | -------------
+id          | integer
+productname | VARCHAR(500)
+category    | VARCHAR(300)
+price       | FLOAT
+
+
+
+
+## orders
+
+Column   | Type
+------- | -------------
+id      | integer
+user_id | bigint
+status  | Status
+
+
+## order_product
+Column     | Type         
+---------- | -------------
+id         | integer
+product_id | bigint
+order_id   | bigint
+quantity   | integer
+
+------------------------------------------
+
 
 # .env File
 

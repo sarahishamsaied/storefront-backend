@@ -13,8 +13,7 @@ export const orderRoutes = (app: express.Application): void => {
   app.get('/api/orders', checkAuthHeader, index);
   app.get('/api/order/:id', checkAuthHeader, show);
   app.post('/api/order', checkAuthHeader, create);
-  app.post('/api/orders/:id/products', checkAuthHeader, addProduct);
-  app.get('/api/orders/complete/:id', checkAuthHeader, completeOrder);
+  app.patch('/api/orders/complete/:id', checkAuthHeader, completeOrder);
 };
 const index = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -70,10 +69,10 @@ const show = async (req: Request, res: Response): Promise<void> => {
 const completeOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const id: string = req.params.id;
-    const response = await store.completeOrder(id);
-    console.log(response);
+    const order = await store.completeOrder(id);
     res.json({
       message: 'success',
+      order,
     });
   } catch (error) {
     if (error instanceof Error)

@@ -75,6 +75,9 @@ Upcoming simple online store using Typescript & PostgreSql.
 
 > - [Show Info](#add-order-json-format) : POST `/api/order`
 
+> - [Show Info](#complete-order-response-json-format) : PATCH `/api/orders/complete/:id`
+
+
 # Database Creation
 
     > `CREATE DATABASE online_store `
@@ -132,6 +135,166 @@ Upcoming simple online store using Typescript & PostgreSql.
 | quantity   | integer                      |
 
 ---
+
+# Sign Up JSON Format
+    {
+        "user_email":"janedoe@gmail.com",
+        "firstname":"jane",
+        "lastname":"doe",
+        "user_password":"janedoe123"
+    }
+    
+# Sign In JSON Format
+
+    {
+    "user_email":"janedoe@gmail.com",
+    "user_password":"jane"
+    }
+    
+# GET Users Response JSON Format
+
+    {
+        "status": 200,
+        "users": [
+            {
+                "id": 1,
+                "firstname": "jane",
+                "lastname": "doe",
+                "user_email": "janedoe@gmail.com",
+                "user_password": "$2b$10$s.y7ZpeDR5Tm3VaxOCBgLe/2Zo2hFIUnNXUNJJBe89khzVgfXgJ.S"
+            }
+         ]
+    }
+    
+ # GET User Response JSON Format
+ 
+     {
+        "status": 200,
+        "user": {
+            "id": 1,
+            "firstname": "sarah",
+            "lastname": "hisham",
+            "user_email": "sarahisham@gmail.com",
+            "user_password": "$2b$10$s.y7ZpeDR5Tm3VaxOCBgLe/2Zo2hFIUnNXUNJJBe89khzVgfXgJ.S"
+        }
+    }
+   
+# DELETE User Response JSON Format
+
+    {
+        "removed": "success"
+    }
+# ADD Product JSON Format
+
+    {
+        "productname":"Apple Air Pods",
+        "price":100,
+        "category":"Air Pods"
+    }
+    
+# GET Products Response JSON Format
+
+    {
+        "message": "success",
+        "products": [
+                {
+                "id": 1,
+                "productname": "Apple Air Pods",
+                "price": 100,
+                "category": "Air Pods"
+                }
+        ]
+    }
+# GET Product Response JSON Format
+
+    {
+        "message": "success",
+        "product": {
+            "id": 1,
+               "productname": "Apple Air Pods",
+               "price": 100,
+              "category": "Air Pods"
+        }
+    }
+    
+# DELETE Product Response JSON Format
+ 
+    {
+        "message": "success"
+    }
+    
+# ADD Order JSON Format
+
+    {
+        "user_id":1,
+        "products":[
+            {
+                "product_id":1,
+                "quantity":33
+            }
+        ]
+    }
+    
+# ADD Order Response JSON Format
+    {
+        "message": "success",
+        "order": {
+            "id": 1,
+            "user_id": 1,
+            "status": "ACTIVE",
+            "products": [
+                {
+                    "product_id": "1",
+                    "quantity": 33
+                }
+            ]
+        }
+ }
+ 
+ # GET Orders Response JSON Format
+ 
+     {
+        "message": "success",
+        "orders": [
+            {
+                "id": 1,
+                "user_id": 1,
+                "status": "ACTIVE",
+                "products": [
+                    {
+                        "product_id": "1",
+                        "quantity": 33
+                    }
+               ]
+          }  
+    }
+# GET Order Response JSON Format
+
+    {
+        "message": "success",
+        "order": {
+            "id": 1,
+            "user_id": 1,
+            "status": "ACTIVE",
+            "products": [
+                {
+                    "product_id": "1",
+                    "quantity": 33
+                }
+            ]
+        }
+    }
+    
+# COMPLETE Order Response JSON Format
+
+    {
+        "message": "success",
+        "order": {
+            "id": 7,
+            "user_id": 1,
+            "status": "COMPLETE"
+        }
+    }
 
 # .env File
 

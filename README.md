@@ -1,6 +1,6 @@
 # Udacity Storefront Backend
 
-Upcoming simple online store using Typescript & PostgreSql.
+Simple online store using Typescript & PostgreSql.
 
 ## Tools & Dependencies
 

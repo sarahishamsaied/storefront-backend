@@ -10,7 +10,7 @@
     "lint-fix": "eslint . --ext .ts --fix",
     "int": "npm install && cd client && npm install",
     "start": "nodemon src/index.ts",
-    "test": "SET ENV=TEST&& db-migrate --env test up && npm run build && db-migrate db:drop test && npm run jasmine",
+    "test": "npm run build && SET ENV=TEST&& db-migrate --env test up && db-migrate db:drop test && npm run jasmine",
     "jasmine": "jasmine"
   },
   "keywords": [],
@@ -40,6 +40,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "jasmine": "^3.99.0",
     "jasmine-spec-reporter": "^7.0.0",
+    "jasmine-ts": "^0.4.0",
     "prettier": "^2.7.1",
     "supertest": "^6.2.4",
     "typescript": "^4.8.2"

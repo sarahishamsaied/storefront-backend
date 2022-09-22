@@ -17,7 +17,7 @@ const index = async (req: Request, res: Response): Promise<void> => {
 };
 const show = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id: number = parseInt(req.params.id);
+    const id: string = req.params.id;
     const product = await store.show(id);
     product
       ? res.json({
@@ -70,7 +70,7 @@ const showByCategory = async (req: Request, res: Response): Promise<void> => {
   }
 };
 const remove = async (req: Request, res: Response): Promise<void> => {
-  const id: number = parseInt(req.params.id);
+  const id: string = req.params.id;
   try {
     const response = await store.delete(id);
     console.log(response);

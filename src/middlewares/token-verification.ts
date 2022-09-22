@@ -7,13 +7,13 @@ export function checkAuthHeader(
 ): void | boolean {
   if (!req.headers.authorization) {
     res.status(401);
+    console.log('access denied');
+
     res.json('Access denied, invalid token');
 
     return false;
   }
-
   try {
-    console.log(req.headers.authorization);
     const token = req.headers.authorization.slice(7);
     jwt.verify(token, process.env.TOKEN_SECRET as string);
     next();

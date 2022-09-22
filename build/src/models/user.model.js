@@ -152,7 +152,7 @@ class UserStore {
                     }
                 }
                 else {
-                    errorMessage = 'User not found';
+                    errorMessage = `email  ${email} doesn't exist`;
                     throw new Error(errorMessage);
                 }
             }

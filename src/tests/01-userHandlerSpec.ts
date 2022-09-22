@@ -3,15 +3,14 @@ import jwt from 'jsonwebtoken';
 import app from '../index';
 import { BaseUser, User } from '../models/user.model';
 const request = supertest(app);
+export let token: string;
 describe('User Handler', () => {
   const userData: BaseUser = {
-    user_email: 'testtesttest',
-    firstname: 'test',
-    lastname: 'test',
+    user_email: 'sara123@gmail.com',
+    firstname: 'sarah',
+    lastname: 'hisham',
     user_password: 'password123',
   };
-
-  let token: string;
   it('gets the create endpoint', async () => {
     request
       .post('/api/auth/signup')
@@ -53,8 +52,8 @@ describe('User Handler', () => {
     request
       .post('/api/auth/signin')
       .send({
-        username: userData.user_email,
-        password: userData.user_password,
+        user_email: userData.user_email,
+        user_password: userData.user_password,
       })
       .set('Authorization', 'bearer ' + token)
       .then((res) => {
@@ -66,20 +65,20 @@ describe('User Handler', () => {
     request
       .post('/api/auth/signin')
       .send({
-        username: userData.user_email,
-        password: 'wrongpw',
+        user_email: userData.user_email,
+        user_password: 'wrongpw',
       })
       .set('Authorization', 'bearer ' + token)
       .then((res) => {
         expect(res.status).toBe(400);
       });
   });
-  it('gets the delete endpoint', () => {
-    request
-      .delete(`/api/user/1`)
-      .set('Authorization', 'bearer ' + token)
-      .then((res) => {
-        expect(res.status).toBe(200);
-      });
-  });
+  //   it('gets the delete endpoint', () => {
+  //   //     request
+  //       .delete(`/api/user/1`)
+  //       .set('Authorization', 'bearer ' + token)
+  //       .then((res) => {
+  //         expect(res.status).toBe(200);
+  //       });
+  //   });
 });

@@ -33,7 +33,7 @@ const index = async (req: Request, res: Response): Promise<void> => {
 const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const products = req.body.products as unknown as OrderProduct[];
-    const user_id = req.body.user_id as unknown as number;
+    const user_id = req.body.user_id as unknown as string;
 
     if (products === undefined || user_id === undefined) {
       console.log(products);
@@ -56,13 +56,14 @@ const create = async (req: Request, res: Response): Promise<void> => {
 };
 const show = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = req.params.id as unknown as number;
+    const id = req.params.id as unknown as string;
     const order = await store.show(id);
     res.json({
       message: 'success',
       order,
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json(error);
   }
 };
@@ -85,8 +86,8 @@ const completeOrder = async (req: Request, res: Response): Promise<void> => {
 
 const addProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const orderId = req.params.id as unknown as number;
-    const productId = req.body.product_id as unknown as number;
+    const orderId = req.params.id as unknown as string;
+    const productId = req.body.product_id as unknown as string;
     const quantity = req.body.quantity as unknown as number;
     console.log(orderId, productId, quantity);
     const addedProduct = await store.addProduct(orderId, quantity, productId);

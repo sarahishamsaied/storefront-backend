@@ -9,14 +9,14 @@ export interface BaseUser {
   user_password: string;
 }
 export interface User extends BaseUser {
-  id: number;
+  id: string;
 }
 const checkEmpty = (str: string): boolean => {
   console.log(str.length);
   return str.length > 0 ? false : true;
 };
 
-const checkUserExists = async (id: number): Promise<boolean> => {
+const checkUserExists = async (id: string): Promise<boolean> => {
   const connection = await Client.connect();
   const sql = `SELECT * FROM users WHERE id = '${id}'`;
   const result = await connection.query(sql);
@@ -54,7 +54,7 @@ const addUser = async (user: BaseUser): Promise<User> => {
   }
 };
 
-const deleteUser = async (id: number): Promise<void> => {
+const deleteUser = async (id: string): Promise<void> => {
   const connection = await Client.connect();
   const sql = `DELETE FROM users WHERE id = ${id}`;
   const result = await connection.query(sql);
@@ -84,7 +84,7 @@ export default class UserStore {
       throw new Error('error');
     }
   };
-  async getUser(id: number): Promise<User> {
+  async getUser(id: string): Promise<User> {
     let errorMessage = 'Cannot get user';
     try {
       const connection = await Client.connect();
@@ -114,7 +114,7 @@ export default class UserStore {
           throw new Error(errorMessage);
         }
       } else {
-        errorMessage = 'User not found';
+        errorMessage = `email  ${email} doesn't exist`;
         throw new Error(errorMessage);
       }
     } catch (error) {
@@ -151,7 +151,7 @@ export default class UserStore {
       throw new Error(errorMessage);
     }
   }
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     let errorMessage = 'Cannot remove user';
     const userExists = await checkUserExists(id);
     try {

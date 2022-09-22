@@ -54,6 +54,7 @@ class OrderStore {
                 return Object.assign(Object.assign({}, order), { products: orderProductRows });
             }
             catch (error) {
+                console.log(error);
                 throw new Error('Cannot get order');
             }
         });
@@ -73,6 +74,7 @@ class OrderStore {
                 return response.rows[0];
             }
             catch (error) {
+                console.log(error);
                 throw new Error(errorMessage);
             }
         });
@@ -87,6 +89,7 @@ class OrderStore {
                 return response.rows[0];
             }
             catch (error) {
+                console.log(error);
                 throw new Error('cannot add product');
             }
         });

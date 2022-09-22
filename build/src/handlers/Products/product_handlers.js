@@ -29,7 +29,7 @@ const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const show = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
         const product = yield store.show(id);
         product
             ? res.json({
@@ -85,7 +85,7 @@ const showByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     try {
         const response = yield store.delete(id);
         console.log(response);

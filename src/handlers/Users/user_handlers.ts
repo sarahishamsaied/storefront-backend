@@ -55,7 +55,7 @@ const create = async (req: Request, res: Response): Promise<void> => {
 };
 const remove = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id: number = parseInt(req.params.id);
+    const id: string = req.params.id;
     const result = await store.remove(id);
     res.status(200).json({
       removed: 'success',
@@ -104,7 +104,7 @@ const login = async (req: Request, res: Response) => {
 };
 const show = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id: number = req.params.id as unknown as number;
+    const id = req.params.id as unknown as string;
     if (id === undefined)
       res.status(400).json({
         message: 'missing id',

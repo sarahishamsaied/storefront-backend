@@ -26,6 +26,7 @@ class ProductStore {
                 return result.rows;
             }
             catch (error) {
+                console.log(error);
                 throw new Error('Cannot get products');
             }
         });
@@ -39,6 +40,7 @@ class ProductStore {
                 return result.rows[0];
             }
             catch (error) {
+                console.log('=================== show error ==============');
                 console.log(error);
                 throw new Error('Cannot get user');
             }
@@ -58,10 +60,10 @@ class ProductStore {
                 const connection = yield database_1.default.connect();
                 const sql = `INSERT INTO products (productname,price,category) VALUES ('${product.productname}',${product.price},'${product.category}') RETURNING *`;
                 const addedProduct = yield connection.query(sql);
-                console.log('added products', addedProduct.rows[0]);
                 return addedProduct.rows[0];
             }
             catch (error) {
+                console.log('=================== create error ==============');
                 console.log(error);
                 throw new Error(errorMessage);
             }
@@ -76,6 +78,7 @@ class ProductStore {
                 return result.rows;
             }
             catch (error) {
+                console.log(error);
                 throw new Error('Cannot get products');
             }
         });
@@ -91,9 +94,10 @@ class ProductStore {
                     errorMessage = `Product with id = ${id} is not found`;
                     throw new Error(errorMessage);
                 }
-                console.log(result);
             }
             catch (error) {
+                console.log('=================== delete error ==============');
+                console.log(error);
                 throw new Error(errorMessage);
             }
         });

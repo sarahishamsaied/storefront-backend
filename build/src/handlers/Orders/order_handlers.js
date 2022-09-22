@@ -70,6 +70,7 @@ const show = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
+        console.log(error);
         res.status(400).json(error);
     }
 });

@@ -64,7 +64,7 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const remove = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
         const result = yield store.remove(id);
         res.status(200).json({
             removed: 'success',

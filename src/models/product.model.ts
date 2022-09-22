@@ -6,7 +6,7 @@ export interface BaseProduct {
   category: string;
 }
 export interface Product extends BaseProduct {
-  id: number;
+  id: string;
   productname: string;
   price: number;
   category: string;
@@ -22,16 +22,19 @@ export default class ProductStore {
       const result = await connection.query(sql);
       return result.rows;
     } catch (error) {
+      console.log(error);
       throw new Error('Cannot get products');
     }
   }
-  async show(id: number): Promise<Product> {
+  async show(id: string): Promise<Product> {
     try {
       const connection = await Client.connect();
       const sql = `SELECT * FROM products where id = ${id}`;
       const result = await connection.query(sql);
       return result.rows[0];
     } catch (error) {
+      console.log('=================== show error ==============');
+
       console.log(error);
       throw new Error('Cannot get user');
     }
@@ -49,9 +52,9 @@ export default class ProductStore {
       const connection = await Client.connect();
       const sql = `INSERT INTO products (productname,price,category) VALUES ('${product.productname}',${product.price},'${product.category}') RETURNING *`;
       const addedProduct = await connection.query(sql);
-      console.log('added products', addedProduct.rows[0]);
       return addedProduct.rows[0];
     } catch (error) {
+      console.log('=================== create error ==============');
       console.log(error);
       throw new Error(errorMessage);
     }
@@ -63,10 +66,11 @@ export default class ProductStore {
       const result = await connection.query(sql);
       return result.rows;
     } catch (error) {
+      console.log(error);
       throw new Error('Cannot get products');
     }
   }
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     let errorMessage = 'Cannot delete product';
     try {
       const connection = await Client.connect();
@@ -76,8 +80,9 @@ export default class ProductStore {
         errorMessage = `Product with id = ${id} is not found`;
         throw new Error(errorMessage);
       }
-      console.log(result);
     } catch (error) {
+      console.log('=================== delete error ==============');
+      console.log(error);
       throw new Error(errorMessage);
     }
   }

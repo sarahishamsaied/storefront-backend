@@ -1,16 +1,16 @@
 import Client from '../../Database/database';
 export interface BaseOrder {
   products: OrderProduct[];
-  user_id: number;
+  user_id: string;
   status: Status;
 }
 export interface OrderProduct {
-  product_id: number;
+  product_id: string;
   quantity: number;
 }
 export interface Order extends BaseOrder {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   status: Status;
 }
 export enum Status {
@@ -42,7 +42,7 @@ export class OrderStore {
       throw new Error('Cannot get orders');
     }
   }
-  async show(id: number): Promise<Order> {
+  async show(id: string): Promise<Order> {
     try {
       const sql = 'SELECT * FROM orders WHERE id=($1)';
       const connection = await Client.connect();
@@ -60,6 +60,7 @@ export class OrderStore {
         products: orderProductRows,
       };
     } catch (error) {
+      console.log(error);
       throw new Error('Cannot get order');
     }
   }
@@ -76,13 +77,14 @@ export class OrderStore {
       }
       return response.rows[0];
     } catch (error) {
+      console.log(error);
       throw new Error(errorMessage);
     }
   }
   async addProduct(
-    order_id: number,
+    order_id: string,
     quantity: number,
-    product_id: number
+    product_id: string
   ): Promise<BaseOrder> {
     try {
       const connection = await Client.connect();
@@ -91,6 +93,7 @@ export class OrderStore {
       console.log('join table', response);
       return response.rows[0];
     } catch (error) {
+      console.log(error);
       throw new Error('cannot add product');
     }
   }

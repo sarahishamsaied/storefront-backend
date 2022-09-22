@@ -16,19 +16,14 @@ const user_model_1 = __importDefault(require("../models/user.model"));
 const UserStoreInstance = new user_model_1.default();
 describe('User Model', () => {
     const user = {
-        user_email: 'hansmeier',
-        firstname: 'Hans',
-        lastname: 'Meier',
-        user_password: 'password123',
+        user_email: 'johndoe@gmail.com',
+        firstname: 'john',
+        lastname: 'doe',
+        user_password: 'userpassword123',
     };
     function createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             return UserStoreInstance.create(user);
-        });
-    }
-    function deleteUser(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return UserStoreInstance.remove(id);
         });
     }
     it('should have an index method', () => {
@@ -51,24 +46,9 @@ describe('User Model', () => {
             expect(firstname).toBe(user.firstname);
             expect(lastname).toBe(user.lastname);
         }
-        yield deleteUser(createdUser.id);
     }));
     it('index method should return a list of users', () => __awaiter(void 0, void 0, void 0, function* () {
-        const createdUser = yield createUser(user);
         const userList = yield UserStoreInstance.index();
-        expect(userList).toEqual([createdUser]);
-        yield deleteUser(createdUser.id);
-    }));
-    it('show method should return the correct users', () => __awaiter(void 0, void 0, void 0, function* () {
-        const createdUser = yield createUser(user);
-        const userFromDb = yield UserStoreInstance.getUser(createdUser.id);
-        expect(userFromDb).toEqual(createdUser);
-        yield deleteUser(createdUser.id);
-    }));
-    it('remove method should remove the user', () => __awaiter(void 0, void 0, void 0, function* () {
-        const createdUser = yield createUser(user);
-        yield deleteUser(createdUser.id);
-        const userList = yield UserStoreInstance.index();
-        expect(userList).toEqual([]);
+        expect(userList.length).toEqual(2);
     }));
 });
